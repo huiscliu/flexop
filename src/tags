@@ -1,0 +1,71 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+NULL_STRING	flexop.c	322;"	d	file:
+STACK_MAX	flexop.c	316;"	d	file:
+argc_new	flexop.c	/^static int argc_save = 0, argc_new = 0, argc_new_allocated = 0;$/;"	v	file:
+argc_new_allocated	flexop.c	/^static int argc_save = 0, argc_new = 0, argc_new_allocated = 0;$/;"	v	file:
+argc_save	flexop.c	/^static int argc_save = 0, argc_new = 0, argc_new_allocated = 0;$/;"	v	file:
+argv_new	flexop.c	/^static char **argv_save = NULL, **argv_new = NULL;$/;"	v	file:
+argv_save	flexop.c	/^static char **argv_save = NULL, **argv_new = NULL;$/;"	v	file:
+comp_string	flexop.c	/^static int comp_string(const void *p1, const void *p2)$/;"	f	file:
+dummy_null	flexop.c	/^static char dummy_null;$/;"	v	file:
+flexop_comp	flexop.c	/^static int flexop_comp(const void *i0, const void *i1)$/;"	f	file:
+flexop_finalize	flexop.c	/^void flexop_finalize(void)$/;"	f
+flexop_free	flexop.c	/^static void flexop_free(FLEXOP *o)$/;"	f	file:
+flexop_get_double	flexop.c	/^FLT_TYPE flexop_get_double(const char *op_name)$/;"	f
+flexop_get_int	flexop.c	/^int flexop_get_int(const char *op_name)$/;"	f
+flexop_get_keyword	flexop.c	/^const char * flexop_get_keyword(const char *op_name)$/;"	f
+flexop_get_no_arg	flexop.c	/^int flexop_get_no_arg(const char *op_name)$/;"	f
+flexop_get_string	flexop.c	/^const char * flexop_get_string(const char *op_name)$/;"	f
+flexop_help	flexop.c	/^void flexop_help(void)$/;"	f
+flexop_init	flexop.c	/^void flexop_init(int *argc, char ***argv)$/;"	f
+flexop_initialized	flexop.c	/^int flexop_initialized = 0;$/;"	v
+flexop_parse_cmdline	flexop.c	/^void flexop_parse_cmdline(int *argc, char ***argv)$/;"	f
+flexop_pop	flexop.c	/^void flexop_pop(void)$/;"	f
+flexop_preset	flexop.c	/^void flexop_preset(const char *str)$/;"	f
+flexop_print_help	flexop.c	/^void flexop_print_help(FLEXOP *o, const char *help)$/;"	f
+flexop_push	flexop.c	/^void flexop_push(void)$/;"	f
+flexop_register	flexop.c	/^static void flexop_register(const char *name, const char *help, const char **keys,$/;"	f	file:
+flexop_register_float	flexop.c	/^void flexop_register_float(const char *name, const char *help, FLT_TYPE *var)$/;"	f
+flexop_register_handler	flexop.c	/^void flexop_register_handler(const char *name, const char *help,$/;"	f
+flexop_register_init	flexop.c	/^void flexop_register_init(void)$/;"	f
+flexop_register_int	flexop.c	/^void flexop_register_int(const char *name, const char *help, int *var)$/;"	f
+flexop_register_keyword	flexop.c	/^void flexop_register_keyword(const char *name, const char *help,$/;"	f
+flexop_register_no_arg	flexop.c	/^void flexop_register_no_arg(const char *name, const char *help, int *var)$/;"	f
+flexop_register_string	flexop.c	/^void flexop_register_string(const char *name, const char *help, char **var)$/;"	f
+flexop_register_title	flexop.c	/^void flexop_register_title(const char *str, const char *help, const char *category)$/;"	f
+flexop_reset	flexop.c	/^void flexop_reset(void)$/;"	f
+flexop_set_double	flexop.c	/^int flexop_set_double(const char *op_name, FLT_TYPE value)$/;"	f
+flexop_set_handler	flexop.c	/^int flexop_set_handler(const char *op_name, const char *value)$/;"	f
+flexop_set_int	flexop.c	/^int flexop_set_int(const char *op_name, int value)$/;"	f
+flexop_set_keyword	flexop.c	/^int flexop_set_keyword(const char *op_name, const char *value)$/;"	f
+flexop_set_no_arg	flexop.c	/^int flexop_set_no_arg(const char *op_name, int value)$/;"	f
+flexop_set_options	flexop.c	/^void flexop_set_options(const char *str)$/;"	f
+flexop_set_string	flexop.c	/^int flexop_set_string(const char *op_name, const char *value)$/;"	f
+flexop_show_cmdline	flexop.c	/^void flexop_show_cmdline(void)$/;"	f
+flexop_show_used	flexop.c	/^void flexop_show_used(void)$/;"	f
+flexop_sort	flexop.c	/^static void flexop_sort(void)$/;"	f	file:
+flexop_utils_alloc	flexop-utils.c	/^void * flexop_utils_alloc(size_t size)$/;"	f
+flexop_utils_calloc	flexop-utils.c	/^void * flexop_utils_calloc(size_t nmemb, size_t size)$/;"	f
+flexop_utils_error	flexop-utils.c	/^void flexop_utils_error(int code, const char *fmt, ...)$/;"	f
+flexop_utils_free	flexop-utils.c	/^void flexop_utils_free(void *ptr)$/;"	f
+flexop_utils_printf	flexop-utils.c	/^int flexop_utils_printf(const char *fmt, ...)$/;"	f
+flexop_utils_realloc	flexop-utils.c	/^void * flexop_utils_realloc(void *ptr, size_t size)$/;"	f
+flexop_utils_warning	flexop-utils.c	/^void flexop_utils_warning(const char *fmt, ...)$/;"	f
+get_option	flexop.c	/^static int get_option(const char *op_name, void **pvar, int type, const char *func)$/;"	f	file:
+help_category	flexop.c	/^static char *help_category = NULL;        \/* will be set by '-help' option *\/$/;"	v	file:
+key	flexop.c	/^static FLEXOP *key = NULL;$/;"	v	file:
+options	flexop.c	/^static FLEXOP *options = NULL;$/;"	v	file:
+options_allocated	flexop.c	/^static size_t options_count = 0, options_allocated = 0;$/;"	v	file:
+options_count	flexop.c	/^static size_t options_count = 0, options_allocated = 0;$/;"	v	file:
+options_index	flexop.c	/^static int *options_index = NULL;$/;"	v	file:
+parse_options	flexop.c	/^static void parse_options(int *argc, char ***argv, int *size, const char *optstr)$/;"	f	file:
+process_options_file	flexop.c	/^static void process_options_file(const char *fn)$/;"	f	file:
+pstack	flexop.c	/^static int pstack = 0;$/;"	v	file:
+save_option	flexop.c	/^static void save_option(int k, size_t size, void *ptr)$/;"	f	file:
+set_option	flexop.c	/^static int set_option(const char *op_name, void *value, int type, const char *func)$/;"	f	file:
+stack	flexop.c	/^static void **stack[STACK_MAX];$/;"	v	file:

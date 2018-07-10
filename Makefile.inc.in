@@ -1,0 +1,32 @@
+CPP             = @CPP@
+CPPFLAGS        = @CPPFLAGS@
+
+CC              = @CC@
+CFLAGS          = @CFLAGS@
+
+LINKER          = @LINKER@
+LDFLAGS         = @LDFLAGS@
+LIBS            = @LIBS@
+
+AR              = @AR@
+RANLIB          = @RANLIB@
+
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+bindir		= @bindir@
+libdir		= @libdir@
+includedir	= @includedir@
+RPATH_FLAG	= @RPATH_FLAG@
+
+.c.o:
+	${CC} -c $*.c ${CFLAGS} ${CPPFLAGS}
+	@echo
+
+% : %.o
+	${LINKER} -o $@ $*.o ${LDFLAGS} ${LIBS}
+	@echo
+
+% : %.c
+	${CC} ${CFLAGS} ${CPPFLAGS} -c $*.c
+	${LINKER} ${LDFLAGS} -o $@ $*.o ${LIBS}
+	@echo
