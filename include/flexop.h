@@ -16,7 +16,7 @@ void flexop_finalize(void);
 
 void flexop_register_init(void);
 void flexop_register_no_arg(const char *name, const char *help, int *var);
-void flexop_register_int(const char *name, const char *help, int *var);
+void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var);
 void flexop_register_float(const char *name, const char *help, FLEXOP_FLOAT *var);
 void flexop_register_string(const char *name, const char *help, char **var);
 void flexop_register_keyword(const char *name, const char *help, const char **keys, int *var);

@@ -76,3 +76,48 @@ void flexop_free(void *ptr)
 {
     if (ptr != NULL) free(ptr);
 }
+
+FLEXOP_FLOAT flexop_atof(const char *ptr)
+{
+    double t;
+    char *end;
+
+#if FLEXOP_USE_LONG_DOUBLE
+    t = strtold(ptr, &end);
+#else
+    t = strtod(ptr, &end);
+#endif
+
+    if (end == ptr || (*end != '\0' && isspace(*end) == 0)) {
+        flexop_error(1, "flexop: ptr: \"%s\" is not a float number.\n", ptr);
+    }
+
+    return t;
+}
+
+FLEXOP_INT flexop_atoi(const char *ptr)
+{
+#if FLEXOP_USE_LONG_LONG
+    long long t;
+#elif FLEXOP_USE_LONG
+    long t;
+#else
+    int t;
+#endif
+    char *end;
+
+#if FLEXOP_USE_LONG_LONG
+    t = strtoll(ptr, &end, 10);
+#elif FLEXOP_USE_LONG
+    t = strtol(ptr, &end, 10);
+#else
+    t = strtol(ptr, &end, 10);
+#endif
+
+    if (end == ptr || (*end != '\0' && isspace(*end) == 0)) {
+        flexop_error(1, "flexop: ptr: \"%s\" is not an integer.\n", ptr);
+    }
+
+    return t;
+}
+

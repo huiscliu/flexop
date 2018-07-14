@@ -35,7 +35,7 @@ typedef int               FLEXOP_INT;
  *
  * - For VT_INT, o->var is intepreted as (INT *)o->var
  *
- * - For VT_DOUBLE, o->var is intepreted as (double *)o->var
+ * - For VT_FLOAT, o->var is intepreted as (double *)o->var
  *
  * - For options without argument (VT_NONE), o->var is intepreted as
  *   (int *)o->var, the cmdline option '-name' sets it to TRUE,
@@ -54,12 +54,17 @@ typedef int               FLEXOP_INT;
 typedef enum {
     VT_NONE,
     VT_INT,
-    VT_DOUBLE,
+    VT_FLOAT,
     VT_STRING,
+
     VT_KEYWORD,
     VT_HANDLER,
     VT_TITLE,
-    VT_INIT
+    VT_INIT,
+
+//    VT_VEC_INT,
+//    VT_VEC_FLOAT,
+//    VT_VEC_STRING,
 
 } FLEXOP_VTYPE;
 
@@ -75,7 +80,7 @@ typedef struct FLEXOP_KEY
                        - VT_STRING  (const char **)var
                        - VT_KEYWORD  (int *)var
                        - VT_INT  (INT *)var
-                       - VT_DOUBLE  (double *)var
+                       - VT_FLOAT  (double *)var
                        - VT_NONE  (int *)var */
 
     FLEXOP_VTYPE type;  /* type of the variable */

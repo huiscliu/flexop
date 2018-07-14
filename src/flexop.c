@@ -132,14 +132,14 @@ void flexop_register_no_arg(const char *name, const char *help, int *var)
     flexop_register(name, help, NULL, var, VT_NONE, 0);
 }
 
-void flexop_register_int(const char *name, const char *help, int *var)
+void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var)
 {
     flexop_register(name, help, NULL, var, VT_INT, 0);
 }
 
 void flexop_register_float(const char *name, const char *help, FLEXOP_FLOAT *var)
 {
-    flexop_register(name, help, NULL, var, VT_DOUBLE, 0);
+    flexop_register(name, help, NULL, var, VT_FLOAT, 0);
 }
 
 void flexop_register_string(const char *name, const char *help, char **var)
@@ -378,13 +378,13 @@ void flexop_show_used(void)
                 break;
 
             case VT_INT:
-                flexop_printf("* %s: %d\n", o->help == NULL ? o->name : o->help,
-                        *(int *)o->var);
+                flexop_printf("* %s: %"IFMT"\n", o->help == NULL ? o->name : o->help,
+                        *(FLEXOP_INT *)o->var);
                 break;
 
-            case VT_DOUBLE:
-                flexop_printf("* %s: %lg\n", o->help == NULL ? o->name : o->help,
-                        (double)*(FLEXOP_FLOAT *)o->var);
+            case VT_FLOAT:
+                flexop_printf("* %s: %"FFMT"\n", o->help == NULL ? o->name : o->help,
+                        (FLEXOP_FLOAT)*(FLEXOP_FLOAT *)o->var);
                 break;
 
             case VT_STRING:
@@ -474,11 +474,11 @@ void flexop_help(void)
                 break;
 
             case VT_INT:
-                flexop_printf("  -%s <integer> (%d)", o->name, *(int *)o->var);
+                flexop_printf("  -%s <integer> (%"IFMT")", o->name, *(FLEXOP_INT *)o->var);
                 break;
 
-            case VT_DOUBLE:
-                flexop_printf("  -%s <real> (%lg)", o->name, (double)*(FLEXOP_FLOAT *)o->var);
+            case VT_FLOAT:
+                flexop_printf("  -%s <real> (%"FFMT")", o->name, (FLEXOP_FLOAT)*(FLEXOP_FLOAT *)o->var);
                 break;
 
             case VT_STRING:
@@ -635,12 +635,12 @@ void flexop_parse_cmdline(int *argc, char ***argv)
                 break;
 
             case VT_INT:
-                *(int *)o->var = atoi(arg);
+                *(FLEXOP_INT *)o->var = flexop_atoi(arg);
                 o->used = 1;
                 break;
 
-            case VT_DOUBLE:
-                *(FLEXOP_FLOAT *)o->var = atof(arg);
+            case VT_FLOAT:
+                *(FLEXOP_FLOAT *)o->var = flexop_atof(arg);
                 o->used = 1;
                 break;
 

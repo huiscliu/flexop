@@ -17,6 +17,9 @@ void * flexop_realloc(void *ptr, size_t size);
 void * flexop_calloc(size_t nmemb, size_t size);
 void   flexop_free(void *ptr);
 
+FLEXOP_FLOAT flexop_atof(const char *ptr);
+FLEXOP_INT flexop_atoi(const char *ptr);
+
 #ifdef __cplusplus
 }
 #endif

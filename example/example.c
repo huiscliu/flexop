@@ -3,7 +3,7 @@
 
 int main(int argc, char **argv)
 {
-    int m = 20;
+    FLEXOP_INT m = 20;
     FLEXOP_FLOAT f = 1.; 
     char *hi = "hello world.";
 
@@ -15,8 +15,8 @@ int main(int argc, char **argv)
     /* init */
     flexop_init(&argc, &argv);
 
-    printf("m: %d\n", m);
-    printf("f: %f\n", f);
+    printf("m: %"IFMT"\n", m);
+    printf("f: %"FFMT"\n", f);
     printf("hi: %s\n", hi);
 
     flexop_finalize();
