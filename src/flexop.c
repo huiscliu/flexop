@@ -122,7 +122,7 @@ static void flexop_register(const char *name, const char *help, const char **key
 }
 
 /* Wrapper functions for enforcing prototype checking */
-void flexop_register_init(void)
+static void flexop_register_init(void)
 {
     flexop_register(NULL, NULL, NULL, NULL, VT_INIT, 0);
 }

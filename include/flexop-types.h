@@ -52,15 +52,17 @@ typedef int               FLEXOP_INT;
  *   which is an index to the list of keywords */
 
 typedef enum {
+    VT_INIT,
     VT_NONE,
+
+    VT_TITLE,
+
     VT_INT,
     VT_FLOAT,
     VT_STRING,
 
     VT_KEYWORD,
     VT_HANDLER,
-    VT_TITLE,
-    VT_INIT,
 
 //    VT_VEC_INT,
 //    VT_VEC_FLOAT,

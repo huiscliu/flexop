@@ -14,7 +14,6 @@ void flexop_init(int *argc, char ***argv);
 /* finalize option */
 void flexop_finalize(void);
 
-void flexop_register_init(void);
 void flexop_register_no_arg(const char *name, const char *help, int *var);
 void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var);
 void flexop_register_float(const char *name, const char *help, FLEXOP_FLOAT *var);
