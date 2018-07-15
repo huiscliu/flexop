@@ -3,3 +3,5 @@
 flexop.o: flexop.c ../include/flexop-config.h ../include/flexop.h ../include/flexop-types.h ../include/flexop-utils.h
 
 flexop-utils.o: flexop-utils.c ../include/flexop-config.h ../include/flexop-types.h ../include/flexop-utils.h
+
+flexop-vec.o: flexop-vec.c ../include/flexop-config.h ../include/flexop-types.h ../include/flexop-utils.h ../include/flexop-vec.h

@@ -27,6 +27,30 @@ typedef long int          FLEXOP_INT;
 typedef int               FLEXOP_INT;
 #endif
 
+#define FLEXOP_VEC_MAGIC_NUMBER        (0x2619EFE)
+
+typedef enum FLEXOP_TYPE_
+{
+    /* basic */
+    FLEXOP_T_STRING,          /* string */
+    FLEXOP_T_INT,             /* int */
+    FLEXOP_T_FLOAT,           /* float */
+
+} FLEXOP_TYPE;
+
+typedef struct FLEXOP_VEC_
+{
+    void *d;
+    FLEXOP_TYPE type;
+
+    FLEXOP_INT size;
+    FLEXOP_INT alloc;
+
+    FLEXOP_INT tsize;
+    FLEXOP_INT magic;
+
+} FLEXOP_VEC;
+
 
 /* All options are stored in a list 'options'. When parsing a cmdline option,
  * the corresponding variable, *o->var, is updated with the given value.
@@ -87,7 +111,6 @@ typedef struct FLEXOP_KEY
 
     FLEXOP_VTYPE type;  /* type of the variable */
     int  used;          /* whether the option is specified in cmdline */
-    int  append;        /* for VT_HANDLER: append or replace */
 
 } FLEXOP_KEY;
 

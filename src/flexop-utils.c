@@ -120,4 +120,3 @@ FLEXOP_INT flexop_atoi(const char *ptr)
 
     return t;
 }
-

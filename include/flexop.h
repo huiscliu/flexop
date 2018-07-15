@@ -19,7 +19,7 @@ void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var);
 void flexop_register_float(const char *name, const char *help, FLEXOP_FLOAT *var);
 void flexop_register_string(const char *name, const char *help, char **var);
 void flexop_register_keyword(const char *name, const char *help, const char **keys, int *var);
-void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER func, int append);
+void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER func);
 void flexop_register_title(const char *str, const char *help, const char *category);
 
 void flexop_reset(void);
