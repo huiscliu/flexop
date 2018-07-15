@@ -41,6 +41,8 @@ typedef enum FLEXOP_TYPE_
 typedef struct FLEXOP_VEC_
 {
     void *d;
+    char *key;
+
     FLEXOP_TYPE type;
 
     FLEXOP_INT size;
@@ -88,7 +90,7 @@ typedef enum {
     VT_KEYWORD,
     VT_HANDLER,
 
-//    VT_VEC_INT,
+    VT_VEC_INT,
 //    VT_VEC_FLOAT,
 //    VT_VEC_STRING,
 

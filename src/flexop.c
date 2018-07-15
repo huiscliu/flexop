@@ -15,6 +15,9 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
         flexop_free(*(char **)o->var);
         *(char **)o->var = NULL;
     }
+    else if (o->type == VT_VEC_INT) {
+        flexop_vec_destroy(o->var);
+    }
 
     if (o->keys != NULL) {
         for (p = o->keys; *p != NULL; p++) flexop_free(*p);
@@ -116,6 +119,9 @@ static void flexop_register(const char *name, const char *help, const char **key
 
         *q = NULL;
     }
+    else if (type == VT_VEC_INT) {
+        flexop_vec_init((FLEXOP_VEC *)o->var, FLEXOP_T_INT, -1, name);
+    }
 }
 
 /* Wrapper functions for enforcing prototype checking */
@@ -159,6 +165,11 @@ void flexop_register_title(const char *str, const char *help, const char *catego
 void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER func)
 {
     flexop_register(name, help, NULL, func, VT_HANDLER);
+}
+
+void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var)
+{
+    flexop_register(name, help, NULL, var, VT_VEC_INT);
 }
 
 static int flexop_comp(const void *i0, const void *i1)
@@ -348,7 +359,7 @@ void flexop_show_cmdline(void)
 /* prints all options which have been called by the user */
 void flexop_show_used(void)
 {
-    int flag = 0;
+    int flag = 0, i;
     FLEXOP_KEY *o;
     char **pp;
 
@@ -412,6 +423,21 @@ void flexop_show_used(void)
                 break;
 
             case VT_TITLE:
+                break;
+
+            case VT_VEC_INT:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("* %s:", o->help == NULL ? o->name : o->help);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf(" %"IFMT, flexop_vec_int_get_value(v, i));
+                    }
+
+                    flexop_printf("\n");
+                }
                 break;
         }
     }
@@ -499,6 +525,22 @@ void flexop_help(void)
 
                 if (o->var != NULL) flexop_printf(" (category \"%s\")", (char *)o->var);
 
+                break;
+
+            case VT_VEC_INT:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("  -%s <integer> (", o->name);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf("%"IFMT, flexop_vec_int_get_value(v, i));
+
+                        if (i < v->size - 1) flexop_printf(" ");
+                    }
+                    flexop_printf(")");
+                }
                 break;
         }
 
@@ -704,6 +746,37 @@ void flexop_parse_cmdline(int *argc, char ***argv)
             case VT_TITLE:
                 /* cannot happen */
                 break;
+
+            case VT_VEC_INT:
+                {
+                    FLEXOP_VEC *v;
+                    FLEXOP_INT tp;
+                    char *ta = NULL;
+                    char *ip;
+
+                    /* init vec */
+                    v = o->var;
+                    if (o->used && flexop_vec_initialized(v)) {
+                        flexop_vec_destroy(v);
+                        flexop_vec_init(v, FLEXOP_T_INT, -1, o->name);
+                    }
+                    
+                    /* parse */
+                    ta = strdup(arg);
+
+                    ip = strtok(ta, " \t");
+
+                    while (ip != NULL) {
+                        tp = flexop_atoi(ip);
+
+                        flexop_vec_add_entry(v, &tp);
+                        ip = strtok(NULL, " \t");
+                    }
+
+                    o->used = 1;
+                    free(ta);
+                }
+                break;
         }
     }
 
@@ -727,5 +800,7 @@ void flexop_init(int *argc, char ***argv)
 
 void flexop_finalize(void)
 {
+    flexop_reset();
+
     itnl_opt.initialized = 1;
 }

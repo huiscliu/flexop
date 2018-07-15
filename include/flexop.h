@@ -2,7 +2,7 @@
 #ifndef FLEX_FLEXOP_H
 #define FLEX_FLEXOP_H
 
-#include "flexop-utils.h"
+#include "flexop-vec.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +21,7 @@ void flexop_register_string(const char *name, const char *help, char **var);
 void flexop_register_keyword(const char *name, const char *help, const char **keys, int *var);
 void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER func);
 void flexop_register_title(const char *str, const char *help, const char *category);
+void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var);
 
 void flexop_reset(void);
 void flexop_show_cmdline(void);

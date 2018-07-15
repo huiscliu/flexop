@@ -13,13 +13,16 @@ int flexop_vec_initialized(FLEXOP_VEC *vec)
     }
 }
 
-void flexop_vec_init(FLEXOP_VEC *vec, FLEXOP_TYPE type, FLEXOP_INT tsize)
+void flexop_vec_init(FLEXOP_VEC *vec, FLEXOP_TYPE type, FLEXOP_INT tsize, const char *key)
 {
     if (vec == NULL) return;
     bzero(vec, sizeof(FLEXOP_VEC));
 
     /* data type */
     vec->type = type;
+
+    assert(key != NULL);
+    vec->key = strdup(key);
 
     /* sizeof type */
     if (type == FLEXOP_T_INT) {
@@ -52,6 +55,7 @@ void flexop_vec_destroy(FLEXOP_VEC *vec)
     }
 
     flexop_free(vec->d);
+    free(vec->key);
     bzero(vec, sizeof(FLEXOP_VEC));
 }
 
@@ -118,4 +122,49 @@ char * flexop_vec_string_get_value(FLEXOP_VEC *v, FLEXOP_INT n)
 
     assert(v->type == FLEXOP_T_STRING);
     return ((char **)v->d)[n];
+}
+
+void flexop_vec_print(FLEXOP_VEC *v)
+{
+    FLEXOP_INT i;
+
+    if (v->type == FLEXOP_T_INT) {
+        FLEXOP_INT *p;
+
+        p = v->d;
+        flexop_printf("flexop: key: \"%s\", vector of int, size: %d, values:", v->key, v->size);
+
+        for (i = 0; i < v->size; i++) {
+            flexop_printf(" %"IFMT, p[i]);
+        }
+
+        flexop_printf("\n");
+    }
+    else if (v->type == FLEXOP_T_FLOAT) {
+        FLEXOP_FLOAT *p;
+
+        p = v->d;
+        flexop_printf("flexop: key: \"%s\", vector of float, size: %d, values:", v->key, v->size);
+
+        for (i = 0; i < v->size; i++) {
+            flexop_printf(" %"FFMT, p[i]);
+        }
+
+        flexop_printf("\n");
+    }
+    else if (v->type == FLEXOP_T_STRING) {
+        char **p;
+
+        p = v->d;
+        flexop_printf("flexop: key: \"%s\", vector of string, size: %d, values:", v->key, v->size);
+
+        for (i = 0; i < v->size; i++) {
+            flexop_printf(" \"%s\"", p[i]);
+        }
+
+        flexop_printf("\n");
+    }
+    else {
+        flexop_error(1, "flexop: parsing module not implemented yet.\n");
+    }
 }
