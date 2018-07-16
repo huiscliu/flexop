@@ -13,7 +13,7 @@ int flexop_vec_initialized(FLEXOP_VEC *vec)
     }
 }
 
-void flexop_vec_init(FLEXOP_VEC *vec, FLEXOP_TYPE type, FLEXOP_INT tsize, const char *key)
+void flexop_vec_init(FLEXOP_VEC *vec, FLEXOP_VTYPE type, FLEXOP_INT tsize, const char *key)
 {
     if (vec == NULL) return;
     bzero(vec, sizeof(FLEXOP_VEC));
@@ -25,13 +25,13 @@ void flexop_vec_init(FLEXOP_VEC *vec, FLEXOP_TYPE type, FLEXOP_INT tsize, const 
     vec->key = strdup(key);
 
     /* sizeof type */
-    if (type == FLEXOP_T_INT) {
+    if (type == VT_INT) {
         vec->tsize = sizeof(FLEXOP_INT);
     }
-    else if (type == FLEXOP_T_FLOAT) {
+    else if (type == VT_FLOAT) {
         vec->tsize = sizeof(FLEXOP_FLOAT);
     }
-    else if (type == FLEXOP_T_STRING) {
+    else if (type == VT_STRING) {
         vec->tsize = sizeof(char *);
     }
     else {
@@ -48,7 +48,7 @@ void flexop_vec_destroy(FLEXOP_VEC *vec)
 
     if (vec == NULL) return;
 
-    if (vec->type == FLEXOP_T_STRING) {
+    if (vec->type == VT_STRING) {
         for (i = 0; i < vec->size; i++) {
             free(((char **)vec->d)[i]);
         }
@@ -72,13 +72,13 @@ void flexop_vec_add_entry(FLEXOP_VEC *v, void *e)
         v->d = flexop_realloc(v->d, v->alloc * v->tsize);
     }
 
-    if (v->type == FLEXOP_T_INT) {
+    if (v->type == VT_INT) {
         ((FLEXOP_INT *)v->d)[v->size++] = *(FLEXOP_INT *)e;
     }
-    else if (v->type == FLEXOP_T_FLOAT) {
+    else if (v->type == VT_FLOAT) {
         ((FLEXOP_FLOAT *)v->d)[v->size++] = *(FLEXOP_FLOAT *)e;
     }
-    else if (v->type == FLEXOP_T_STRING) {
+    else if (v->type == VT_STRING) {
         ((char **)v->d)[v->size++] = strdup(e);
     }
     else {
@@ -100,7 +100,7 @@ FLEXOP_INT flexop_vec_int_get_value(FLEXOP_VEC *v, FLEXOP_INT n)
     assert(n >= 0);
     assert(n < v->size);
 
-    assert(v->type == FLEXOP_T_INT);
+    assert(v->type == VT_INT);
     return ((FLEXOP_INT *)v->d)[n];
 }
 
@@ -110,7 +110,7 @@ FLEXOP_FLOAT flexop_vec_float_get_value(FLEXOP_VEC *v, FLEXOP_INT n)
     assert(n >= 0);
     assert(n < v->size);
 
-    assert(v->type == FLEXOP_T_FLOAT);
+    assert(v->type == VT_FLOAT);
     return ((FLEXOP_FLOAT *)v->d)[n];
 }
 
@@ -120,7 +120,7 @@ char * flexop_vec_string_get_value(FLEXOP_VEC *v, FLEXOP_INT n)
     assert(n >= 0);
     assert(n < v->size);
 
-    assert(v->type == FLEXOP_T_STRING);
+    assert(v->type == VT_STRING);
     return ((char **)v->d)[n];
 }
 
@@ -128,7 +128,7 @@ void flexop_vec_print(FLEXOP_VEC *v)
 {
     FLEXOP_INT i;
 
-    if (v->type == FLEXOP_T_INT) {
+    if (v->type == VT_INT) {
         FLEXOP_INT *p;
 
         p = v->d;
@@ -140,7 +140,7 @@ void flexop_vec_print(FLEXOP_VEC *v)
 
         flexop_printf("\n");
     }
-    else if (v->type == FLEXOP_T_FLOAT) {
+    else if (v->type == VT_FLOAT) {
         FLEXOP_FLOAT *p;
 
         p = v->d;
@@ -152,7 +152,7 @@ void flexop_vec_print(FLEXOP_VEC *v)
 
         flexop_printf("\n");
     }
-    else if (v->type == FLEXOP_T_STRING) {
+    else if (v->type == VT_STRING) {
         char **p;
 
         p = v->d;

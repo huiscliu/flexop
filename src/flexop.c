@@ -120,7 +120,7 @@ static void flexop_register(const char *name, const char *help, const char **key
         *q = NULL;
     }
     else if (type == VT_VEC_INT) {
-        flexop_vec_init((FLEXOP_VEC *)o->var, FLEXOP_T_INT, -1, name);
+        flexop_vec_init((FLEXOP_VEC *)o->var, VT_INT, -1, name);
     }
 }
 
@@ -758,7 +758,7 @@ void flexop_parse_cmdline(int *argc, char ***argv)
                     v = o->var;
                     if (o->used && flexop_vec_initialized(v)) {
                         flexop_vec_destroy(v);
-                        flexop_vec_init(v, FLEXOP_T_INT, -1, o->name);
+                        flexop_vec_init(v, VT_INT, -1, o->name);
                     }
                     
                     /* parse */
