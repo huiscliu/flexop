@@ -66,8 +66,8 @@ typedef enum {
     VT_HANDLER,
 
     VT_VEC_INT,
-//    VT_VEC_FLOAT,
-//    VT_VEC_STRING,
+    VT_VEC_FLOAT,
+    VT_VEC_STRING,
 
 } FLEXOP_VTYPE;
 

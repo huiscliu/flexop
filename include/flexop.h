@@ -22,6 +22,8 @@ void flexop_register_keyword(const char *name, const char *help, const char **ke
 void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER func);
 void flexop_register_title(const char *str, const char *help, const char *category);
 void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var);
+void flexop_register_vec_float(const char *name, const char *help, FLEXOP_VEC *var);
+void flexop_register_vec_string(const char *name, const char *help, FLEXOP_VEC *var);
 
 void flexop_reset(void);
 void flexop_show_cmdline(void);

@@ -15,7 +15,7 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
         flexop_free(*(char **)o->var);
         *(char **)o->var = NULL;
     }
-    else if (o->type == VT_VEC_INT) {
+    else if (o->type == VT_VEC_INT || o->type == VT_VEC_FLOAT || o->type == VT_VEC_STRING) {
         flexop_vec_destroy(o->var);
     }
 
@@ -122,6 +122,12 @@ static void flexop_register(const char *name, const char *help, const char **key
     else if (type == VT_VEC_INT) {
         flexop_vec_init((FLEXOP_VEC *)o->var, VT_INT, -1, name);
     }
+    else if (type == VT_VEC_FLOAT) {
+        flexop_vec_init((FLEXOP_VEC *)o->var, VT_FLOAT, -1, name);
+    }
+    else if (type == VT_VEC_STRING) {
+        flexop_vec_init((FLEXOP_VEC *)o->var, VT_STRING, -1, name);
+    }
 }
 
 /* Wrapper functions for enforcing prototype checking */
@@ -170,6 +176,16 @@ void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER 
 void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var)
 {
     flexop_register(name, help, NULL, var, VT_VEC_INT);
+}
+
+void flexop_register_vec_float(const char *name, const char *help, FLEXOP_VEC *var)
+{
+    flexop_register(name, help, NULL, var, VT_VEC_FLOAT);
+}
+
+void flexop_register_vec_string(const char *name, const char *help, FLEXOP_VEC *var)
+{
+    flexop_register(name, help, NULL, var, VT_VEC_STRING);
 }
 
 static int flexop_comp(const void *i0, const void *i1)
@@ -438,6 +454,39 @@ void flexop_show_used(void)
 
                     flexop_printf("\n");
                 }
+
+                break;
+
+            case VT_VEC_FLOAT:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("* %s:", o->help == NULL ? o->name : o->help);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf(" %"FFMT, flexop_vec_float_get_value(v, i));
+                    }
+
+                    flexop_printf("\n");
+                }
+
+                break;
+
+            case VT_VEC_STRING:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("* %s:", o->help == NULL ? o->name : o->help);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf(" %s", flexop_vec_string_get_value(v, i));
+                    }
+
+                    flexop_printf("\n");
+                }
+
                 break;
         }
     }
@@ -541,6 +590,41 @@ void flexop_help(void)
                     }
                     flexop_printf(")");
                 }
+
+                break;
+
+            case VT_VEC_FLOAT:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("  -%s <float> (", o->name);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf("%"FFMT, flexop_vec_float_get_value(v, i));
+
+                        if (i < v->size - 1) flexop_printf(" ");
+                    }
+                    flexop_printf(")");
+                }
+
+                break;
+
+            case VT_VEC_STRING:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("  -%s <string> (", o->name);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf("%s", flexop_vec_string_get_value(v, i));
+
+                        if (i < v->size - 1) flexop_printf(" ");
+                    }
+                    flexop_printf(")");
+                }
+
                 break;
         }
 
@@ -776,6 +860,68 @@ void flexop_parse_cmdline(int *argc, char ***argv)
                     o->used = 1;
                     free(ta);
                 }
+
+                break;
+
+            case VT_VEC_FLOAT:
+                {
+                    FLEXOP_VEC *v;
+                    FLEXOP_FLOAT tp;
+                    char *ta = NULL;
+                    char *ip;
+
+                    /* init vec */
+                    v = o->var;
+                    if (o->used && flexop_vec_initialized(v)) {
+                        flexop_vec_destroy(v);
+                        flexop_vec_init(v, VT_FLOAT, -1, o->name);
+                    }
+                    
+                    /* parse */
+                    ta = strdup(arg);
+
+                    ip = strtok(ta, " \t");
+
+                    while (ip != NULL) {
+                        tp = flexop_atof(ip);
+
+                        flexop_vec_add_entry(v, &tp);
+                        ip = strtok(NULL, " \t");
+                    }
+
+                    o->used = 1;
+                    free(ta);
+                }
+
+                break;
+
+            case VT_VEC_STRING:
+                {
+                    FLEXOP_VEC *v;
+                    char *ta = NULL;
+                    char *ip;
+
+                    /* init vec */
+                    v = o->var;
+                    if (o->used && flexop_vec_initialized(v)) {
+                        flexop_vec_destroy(v);
+                        flexop_vec_init(v, VT_STRING, -1, o->name);
+                    }
+                    
+                    /* parse */
+                    ta = strdup(arg);
+
+                    ip = strtok(ta, " \t");
+
+                    while (ip != NULL) {
+                        flexop_vec_add_entry(v, ip);
+                        ip = strtok(NULL, " \t");
+                    }
+
+                    o->used = 1;
+                    free(ta);
+                }
+
                 break;
         }
     }
