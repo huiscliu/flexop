@@ -104,8 +104,14 @@ typedef struct FLEXOP_
     char *help_category;
     char *opt_file;
 
+    /* from command line */
     int argc;
     char **argv;
+
+    /* preset */
+    int argcp;
+    char **argvp;
+    int allocp;
 
     size_t size;
     size_t alloc;

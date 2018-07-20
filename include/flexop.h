@@ -10,12 +10,15 @@ extern "C" {
 
 void flexop_sort(FLEXOP *opt);
 void flexop_parse_options(int *argc, char ***argv, int *alloc, const char *optstr);
+void flexop_parse_options_file(const char *fn);
 
 /* init option */
 void flexop_init(int *argc, char ***argv);
 
 /* finalize option */
 void flexop_finalize(void);
+
+void flexop_preset(const char *str);
 
 void flexop_register_no_arg(const char *name, const char *help, int *var);
 void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var);
@@ -35,7 +38,7 @@ void flexop_print_help(FLEXOP_KEY *o, const char *help);
 void flexop_help(void);
 
 void flexop_parse(int *argc, char ***argv);
-void flexop_parse_cmdline(int argc, char ***argv);
+void flexop_parse_argv(int argc, char ***argv);
 
 int flexop_get_no_arg(const char *op_name);
 FLEXOP_INT flexop_get_int(const char *op_name);

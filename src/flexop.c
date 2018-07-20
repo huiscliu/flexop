@@ -27,6 +27,15 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
     }
 }
 
+void flexop_preset(const char *str)
+{
+    if (itnl_opt.initialized) {
+        flexop_error(1, "flexop_preset must be called before flexop_init!\n");
+    }
+
+    flexop_parse_options(&itnl_opt.argcp, &itnl_opt.argvp, &itnl_opt.allocp, str);
+}
+
 static void flexop_register(const char *name, const char *help, const char **keys, void *var, FLEXOP_VTYPE type)
 {
     FLEXOP_KEY *o;
@@ -600,6 +609,7 @@ void flexop_help(void)
 
                         if (i < v->size - 1) flexop_printf(" ");
                     }
+
                     flexop_printf(")");
                 }
 
@@ -617,6 +627,7 @@ void flexop_help(void)
 
                         if (i < v->size - 1) flexop_printf(" ");
                     }
+
                     flexop_printf(")");
                 }
 
@@ -634,6 +645,7 @@ void flexop_help(void)
 
                         if (i < v->size - 1) flexop_printf(" ");
                     }
+
                     flexop_printf(")");
                 }
 
@@ -763,16 +775,15 @@ void flexop_parse_options(int *argc, char ***argv, int *alloc, const char *optst
     if (*argc < ac) *argc = ac;
 }
 
-#if 0
 /* processes options from file 'fn' */
-static void process_options_file(const char *fn)
+void flexop_parse_options_file(const char *fn)
 {
     FILE *f;
     int i, argc = 0, allocated = 0;
     char *p, **argv = NULL, buffer[4096];
 
     if ((f = fopen(fn, "r")) == NULL) {
-        flexop_printf("Cannot open options file \"%s\".\n", fn);
+        flexop_printf("flexop: cannot open options file \"%s\".\n", fn);
         exit(1);
     }
 
@@ -792,17 +803,18 @@ static void process_options_file(const char *fn)
     if (allocated == 0) return;
 
     argv[argc] = NULL;
-    flexop_parse_cmdline(&argc, &argv);
+
+    /* FFFFFix */
+    flexop_parse_argv(argc, &argv);
 
     for (i = 0; i < argc; i++) flexop_free(argv[i]);
 
     flexop_free(argv);
 }
-#endif
 
 /* parses cmdline parameters, processes and removes known options from
    the argument list */
-void flexop_parse_cmdline(int argc, char ***argv)
+void flexop_parse_argv(int argc, char ***argv)
 {
     FLEXOP_KEY *o, *key = NULL;
     char **pp;
@@ -1040,8 +1052,11 @@ void flexop_parse(int *argc, char ***argv)
     int i, j;
 
     if (!firstcall) {
-        flexop_error(1, "flexop: flexop_parse_cmdline can be called only once.\n");
+        flexop_error(1, "flexop: flexop_parse can be called only once.\n");
     }
+
+    /* mark */
+    firstcall = 0;
 
     /* register internal opt */
     if (itnl_opt.options == NULL) {
@@ -1063,14 +1078,14 @@ void flexop_parse(int *argc, char ***argv)
     }
 
     /* handle preset options */
-    flexop_parse_cmdline(itnl_opt.argc, &itnl_opt.argv);
+    flexop_parse_argv(itnl_opt.argcp, &itnl_opt.argvp);
 
     /* clean up */
-    for (i = 0; i < itnl_opt.argc; i++) {
-        free(itnl_opt.argv[i]);
+    for (i = 0; i < itnl_opt.argcp; i++) {
+        free(itnl_opt.argvp[i]);
     }
 
-    if (itnl_opt.argc > 0) flexop_free(itnl_opt.argv);
+    if (itnl_opt.argcp > 0) flexop_free(itnl_opt.argvp);
 
     /* handle command line */
     assert(*argc > 0);
@@ -1082,9 +1097,10 @@ void flexop_parse(int *argc, char ***argv)
     itnl_opt.argv[i] = NULL;
 
     /* parse */
-    flexop_parse_cmdline(itnl_opt.argc, &itnl_opt.argv);
+    flexop_parse_argv(itnl_opt.argc, &itnl_opt.argv);
 
-    firstcall = 0;
+    /* parse option file */
+    if (itnl_opt.opt_file != NULL) flexop_parse_options_file(itnl_opt.opt_file);
 
     return;
 }
