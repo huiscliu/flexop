@@ -102,6 +102,7 @@ typedef struct FLEXOP_
     FLEXOP_KEY *options;
     int *index;
     char *help_category;
+    char *opt_file;
 
     int argc;
     char **argv;
@@ -109,6 +110,7 @@ typedef struct FLEXOP_
     size_t size;
     size_t alloc;
     int initialized;
+    int sorted;
 
 } FLEXOP;
 

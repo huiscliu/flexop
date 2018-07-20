@@ -8,6 +8,9 @@
 extern "C" {
 #endif
 
+void flexop_sort(FLEXOP *opt);
+void flexop_parse_options(int *argc, char ***argv, int *alloc, const char *optstr);
+
 /* init option */
 void flexop_init(int *argc, char ***argv);
 
@@ -25,12 +28,23 @@ void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var
 void flexop_register_vec_float(const char *name, const char *help, FLEXOP_VEC *var);
 void flexop_register_vec_string(const char *name, const char *help, FLEXOP_VEC *var);
 
-void flexop_reset(void);
+void flexop_reset(FLEXOP *opt);
 void flexop_show_cmdline(void);
 void flexop_show_used(void);
 void flexop_print_help(FLEXOP_KEY *o, const char *help);
 void flexop_help(void);
-void flexop_parse_cmdline(int *argc, char ***argv);
+
+void flexop_parse(int *argc, char ***argv);
+void flexop_parse_cmdline(int argc, char ***argv);
+
+int flexop_get_no_arg(const char *op_name);
+FLEXOP_INT flexop_get_int(const char *op_name);
+FLEXOP_FLOAT flexop_get_float(const char *op_name);
+const char * flexop_get_keyword(const char *op_name);
+const char * flexop_get_string(const char *op_name);
+FLEXOP_VEC * flexop_get_vec_int(const char *op_name);
+FLEXOP_VEC * flexop_get_vec_float(const char *op_name);
+FLEXOP_VEC * flexop_get_vec_string(const char *op_name);
 
 #ifdef __cplusplus
 }
