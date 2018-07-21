@@ -1,7 +1,7 @@
 
 #include "flexop.h"
 
-static FLEXOP itnl_opt;
+static FLEXOP flexop_iopt;
 
 static void flexop_key_destroy(FLEXOP_KEY *o)
 {
@@ -29,11 +29,11 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
 
 void flexop_preset(const char *str)
 {
-    if (itnl_opt.initialized) {
+    if (flexop_iopt.initialized) {
         flexop_error(1, "flexop_preset must be called before flexop_init!\n");
     }
 
-    flexop_parse_options(&itnl_opt.argcp, &itnl_opt.argvp, &itnl_opt.allocp, str);
+    flexop_parse_options(&flexop_iopt.argcp, &flexop_iopt.argvp, &flexop_iopt.allocp, str);
 }
 
 static void flexop_register(const char *name, const char *help, const char **keys, void *var, FLEXOP_VTYPE type)
@@ -41,7 +41,7 @@ static void flexop_register(const char *name, const char *help, const char **key
     FLEXOP_KEY *o;
     static int initialized = 0;
 
-    if (name != NULL && itnl_opt.initialized) {
+    if (name != NULL && flexop_iopt.initialized) {
         flexop_printf("flexop: option \"-%s\" not registered.\n", name);
         return;
     }
@@ -51,42 +51,43 @@ static void flexop_register(const char *name, const char *help, const char **key
 
         /* Register title for user options */
         flexop_register("\nUser options:", "\n", NULL, "user", VT_TITLE);
-        itnl_opt.sorted = 0;
+        flexop_iopt.sorted = 0;
     }
     else if (type == VT_INIT) {
         /* register some global options */
         initialized = 1;
         flexop_register("\nGeneric options:", "\n", NULL, "generic", VT_TITLE);
 
-        flexop_register("-help", "Print options help then exit", NULL, &itnl_opt.help_category, VT_STRING);
-        flexop_register("-option_file", "Options file", NULL, &itnl_opt.opt_file, VT_STRING);
+        flexop_register("-help", "Print options help then exit", NULL, &flexop_iopt.help_category, VT_STRING);
+        flexop_register("-option_file", "Options file", NULL, &flexop_iopt.opt_file, VT_STRING);
 
-        itnl_opt.sorted = 0;
+        flexop_iopt.sorted = 0;
 
         return;
     }
 
     if (name == NULL) return;
 
-    itnl_opt.sorted = 0;
+    /* mark */
+    flexop_iopt.sorted = 0;
 
     if (*name == '-' || *name == '+') name++;
 
-    if (itnl_opt.index != NULL) {
-        /* invalidate index */
-        flexop_free(itnl_opt.index);
-        itnl_opt.index = NULL;
+    /* invalidate index */
+    if (flexop_iopt.index != NULL) {
+        flexop_free(flexop_iopt.index);
+        flexop_iopt.index = NULL;
     }
 
     /* memory */
-    if (itnl_opt.size >= itnl_opt.alloc) {
-        itnl_opt.alloc += 8;
+    if (flexop_iopt.size >= flexop_iopt.alloc) {
+        flexop_iopt.alloc += 8;
 
-        itnl_opt.options = flexop_realloc(itnl_opt.options, itnl_opt.alloc * sizeof(*itnl_opt.options));
+        flexop_iopt.options = flexop_realloc(flexop_iopt.options, flexop_iopt.alloc * sizeof(*flexop_iopt.options));
     }
 
     /* save option */
-    o = itnl_opt.options + (itnl_opt.size++);
+    o = flexop_iopt.options + (flexop_iopt.size++);
 
     o->name = strdup(name);
     o->help = help == NULL ? NULL : strdup(help);
@@ -110,14 +111,14 @@ static void flexop_register(const char *name, const char *help, const char **key
             flexop_printf("flexop_register_keyword(): keys should not be NULL "
                     "(option \"-%s\").\n", name);
             flexop_printf("Option not registered.\n");
-            flexop_key_destroy(itnl_opt.options + itnl_opt.size);
-            itnl_opt.size--;
+            flexop_key_destroy(flexop_iopt.options + flexop_iopt.size);
+            flexop_iopt.size--;
             return;
         }
 
         if (keys[0] == NULL) {
-            flexop_key_destroy(itnl_opt.options + itnl_opt.size);
-            itnl_opt.size--;
+            flexop_key_destroy(flexop_iopt.options + flexop_iopt.size);
+            flexop_iopt.size--;
             return;
         }
 
@@ -147,11 +148,6 @@ static void flexop_register(const char *name, const char *help, const char **key
 }
 
 /* Wrapper functions for enforcing prototype checking */
-static void flexop_register_init(void)
-{
-    flexop_register(NULL, NULL, NULL, NULL, VT_INIT);
-}
-
 void flexop_register_no_arg(const char *name, const char *help, int *var)
 {
     flexop_register(name, help, NULL, var, VT_NONE);
@@ -206,7 +202,7 @@ void flexop_register_vec_string(const char *name, const char *help, FLEXOP_VEC *
 
 static int flexop_comp(const void *i0, const void *i1)
 {
-    FLEXOP_KEY *o0 = itnl_opt.options + *(int *)i0, *o1 = itnl_opt.options + *(int *)i1;
+    FLEXOP_KEY *o0 = flexop_iopt.options + *(int *)i0, *o1 = flexop_iopt.options + *(int *)i1;
 
     /* This makes all separators to appear at the end of the list */
     if (o0->type == VT_TITLE || o1->type == VT_TITLE) {
@@ -302,7 +298,8 @@ void flexop_print_help(FLEXOP_KEY *o, const char *help)
     if (o->type == VT_KEYWORD) {
         char **pp;
 
-        assert(p + 3 < buffer + sizeof(buffer));        /* +1 for '>' */
+        /* +1 for '>' */
+        assert(p + 3 < buffer + sizeof(buffer));
 
         memcpy(p, " <\"", 3);
         p += 3;
@@ -384,11 +381,11 @@ void flexop_show_cmdline(void)
 {
     int i;
 
-    if (itnl_opt.argc <= 1) return;
+    if (flexop_iopt.argc <= 0) return;
 
     flexop_printf("Command-line:");
 
-    for (i = 0; i < itnl_opt.argc; i++) flexop_printf(" %s", itnl_opt.argv[i]);
+    for (i = 0; i < flexop_iopt.argc; i++) flexop_printf(" %s", flexop_iopt.argv[i]);
 
     flexop_printf("\n");
 }
@@ -400,9 +397,9 @@ void flexop_show_used(void)
     FLEXOP_KEY *o;
     char **pp;
 
-    if (!itnl_opt.initialized) flexop_error(1, "%s must be called after flexop_init!\n", __func__);
+    if (!flexop_iopt.initialized) flexop_error(1, "%s must be called after flexop_init!\n", __func__);
 
-    for (o = itnl_opt.options; o < itnl_opt.options + itnl_opt.size; o++) {
+    for (o = flexop_iopt.options; o < flexop_iopt.options + flexop_iopt.size; o++) {
         if (o->used == 0 || o->type == VT_TITLE) continue;
 
         if (!flag) {
@@ -531,15 +528,15 @@ void flexop_help(void)
     char **list = NULL;
     int i, list_count = 0, list_allocated = 0;
 
-    if (itnl_opt.help_category == NULL) return;
+    if (flexop_iopt.help_category == NULL) return;
 
     flag = 1;
     matched = 0;
-    all_flag = !strcmp(itnl_opt.help_category, "all");
+    all_flag = !strcmp(flexop_iopt.help_category, "all");
 
-    for (o = itnl_opt.options; o < itnl_opt.options + itnl_opt.size; o++) {
+    for (o = flexop_iopt.options; o < flexop_iopt.options + flexop_iopt.size; o++) {
         if (!all_flag && o->type == VT_TITLE) {
-            flag = (o->var == NULL || !strcmp(itnl_opt.help_category, o->var));
+            flag = (o->var == NULL || !strcmp(flexop_iopt.help_category, o->var));
 
             if (o->var != NULL && (list_count == 0 || strcmp(list[list_count - 1], o->var))) {
                 if (list_count >= list_allocated) {
@@ -662,13 +659,13 @@ void flexop_help(void)
         flexop_printf("\n");
     }
     else {
-        if (strcmp(itnl_opt.help_category, "help")) {
-            flexop_printf("Unknown help category '%s'.\n", itnl_opt.help_category);
+        if (strcmp(flexop_iopt.help_category, "help")) {
+            flexop_printf("Unknown help category '%s'.\n", flexop_iopt.help_category);
         }
 
         qsort(list, list_count, sizeof(*list), comp_string);
         flexop_printf("Usage:\n    %s -help <category>\n"
-                "where <category> should be one of:\n", itnl_opt.argv[0]);
+                "where <category> should be one of:\n", flexop_iopt.argv[0]);
 
         flexop_printf("    all");
         list_allocated = 7;
@@ -688,7 +685,7 @@ void flexop_help(void)
 
     flexop_free(list);
 
-    flexop_reset(&itnl_opt);
+    flexop_reset(&flexop_iopt);
 
     exit(0);
 }
@@ -804,17 +801,17 @@ void flexop_parse_options_file(const char *fn)
 
     argv[argc] = NULL;
 
-    /* FFFFFix */
-    flexop_parse_argv(argc, &argv);
+    /* parse */
+    flexop_parse_cmdline(argc, &argv);
 
+    /* clean */
     for (i = 0; i < argc; i++) flexop_free(argv[i]);
-
     flexop_free(argv);
 }
 
 /* parses cmdline parameters, processes and removes known options from
    the argument list */
-void flexop_parse_argv(int argc, char ***argv)
+void flexop_parse_cmdline(int argc, char ***argv)
 {
     FLEXOP_KEY *o, *key = NULL;
     char **pp;
@@ -824,8 +821,8 @@ void flexop_parse_argv(int argc, char ***argv)
 
     if (argc <= 0) return;
 
-    flexop_sort(&itnl_opt);
-    key = itnl_opt.options + itnl_opt.size;
+    flexop_sort(&flexop_iopt);
+    key = flexop_iopt.options + flexop_iopt.size;
 
     /* parse */
     for (i = 0; i < argc; i++) {
@@ -842,20 +839,20 @@ void flexop_parse_argv(int argc, char ***argv)
             }
 
             key->name = q;
-            k = bsearch(itnl_opt.index + itnl_opt.size, itnl_opt.index, itnl_opt.size, sizeof(*itnl_opt.index), flexop_comp);
-
+            k = bsearch(flexop_iopt.index + flexop_iopt.size, flexop_iopt.index, flexop_iopt.size,
+                    sizeof(*flexop_iopt.index), flexop_comp);
             flexop_free(q);
             key->name = NULL;
         }
 
         if (k == NULL) flexop_error(1, "unknown option \"%s\"!\n", p);
 
-        o = itnl_opt.options + (*k);
+        o = flexop_iopt.options + (*k);
 
         /* process option */
         if (o->type != VT_NONE) {
             if (arg == NULL && (arg = (*argv)[++i]) == NULL) {
-                if (!strcmp(o->name, itnl_opt.help_category = strdup("help"))) {
+                if (!strcmp(o->name, flexop_iopt.help_category = strdup("help"))) {
                     flexop_printf("Missing argument for option \"%s\".\n", p);
                     flexop_help();
                 }
@@ -1059,48 +1056,47 @@ void flexop_parse(int *argc, char ***argv)
     firstcall = 0;
 
     /* register internal opt */
-    if (itnl_opt.options == NULL) {
+    if (flexop_iopt.options == NULL) {
         /* this will register the options '-help' */
         flexop_register(NULL, NULL, NULL, NULL, VT_NONE);
     }
 
-    flexop_sort(&itnl_opt);
+    flexop_sort(&flexop_iopt);
 
     /* check and warn duplicate options */
     j = 0;
-    for (i = 1; i < (int)itnl_opt.size; i++) {
-        o = itnl_opt.options + itnl_opt.index[i];
+    for (i = 1; i < (int)flexop_iopt.size; i++) {
+        o = flexop_iopt.options + flexop_iopt.index[i];
         if (o->type == VT_TITLE) break;
 
-        if (flexop_comp(itnl_opt.index + i, itnl_opt.index + j) == 0)
+        if (flexop_comp(flexop_iopt.index + i, flexop_iopt.index + j) == 0)
             flexop_warning("duplicate option \"-%s\".\n",o->name);
         j = i;
     }
 
     /* handle preset options */
-    flexop_parse_argv(itnl_opt.argcp, &itnl_opt.argvp);
+    flexop_parse_cmdline(flexop_iopt.argcp, &flexop_iopt.argvp);
 
     /* clean up */
-    for (i = 0; i < itnl_opt.argcp; i++) {
-        free(itnl_opt.argvp[i]);
+    for (i = 0; i < flexop_iopt.argcp; i++) {
+        free(flexop_iopt.argvp[i]);
     }
 
-    if (itnl_opt.argcp > 0) flexop_free(itnl_opt.argvp);
+    if (flexop_iopt.argcp > 0) flexop_free(flexop_iopt.argvp);
 
     /* handle command line */
     assert(*argc > 0);
-    itnl_opt.argc = *argc - 1;
-    itnl_opt.argv = flexop_alloc((itnl_opt.argc + 1) * sizeof(*itnl_opt.argv));
+    flexop_iopt.argc = *argc - 1;
+    flexop_iopt.argv = flexop_alloc((flexop_iopt.argc + 1) * sizeof(*flexop_iopt.argv));
 
-    for (i = 0; i < itnl_opt.argc; i++) itnl_opt.argv[i] = strdup((*argv)[i + 1]);
-
-    itnl_opt.argv[i] = NULL;
+    for (i = 0; i < flexop_iopt.argc; i++) flexop_iopt.argv[i] = strdup((*argv)[i + 1]);
+    flexop_iopt.argv[i] = NULL;
 
     /* parse */
-    flexop_parse_argv(itnl_opt.argc, &itnl_opt.argv);
+    flexop_parse_cmdline(flexop_iopt.argc, &flexop_iopt.argv);
 
     /* parse option file */
-    if (itnl_opt.opt_file != NULL) flexop_parse_options_file(itnl_opt.opt_file);
+    if (flexop_iopt.opt_file != NULL) flexop_parse_options_file(flexop_iopt.opt_file);
 
     return;
 }
@@ -1108,21 +1104,21 @@ void flexop_parse(int *argc, char ***argv)
 void flexop_init(int *argc, char ***argv)
 {
     /* option init */
-    flexop_register_init();
+    flexop_register(NULL, NULL, NULL, NULL, VT_INIT);
 
     /* option parse */
     flexop_parse(argc, argv);
     flexop_help();
 
     /* mark status, has been initialized */
-    itnl_opt.initialized = 1;
+    flexop_iopt.initialized = 1;
 }
 
 void flexop_finalize(void)
 {
-    flexop_reset(&itnl_opt);
+    flexop_reset(&flexop_iopt);
 
-    itnl_opt.initialized = 0;
+    flexop_iopt.initialized = 0;
 }
 
 static int get_option(const char *op_name, void **pvar, int type, const char *func)
@@ -1131,21 +1127,21 @@ static int get_option(const char *op_name, void **pvar, int type, const char *fu
     FLEXOP_KEY *o;
     FLEXOP_KEY *key;
 
-    if (!itnl_opt.initialized) flexop_error(1, "%s must be called after flexop_init!\n", func);
+    if (!flexop_iopt.initialized) flexop_error(1, "%s must be called after flexop_init!\n", func);
 
     if (op_name[0] == '-' || op_name[1] == '+') op_name++;
 
     /* get key */
-    key = itnl_opt.options + itnl_opt.size;
+    key = flexop_iopt.options + flexop_iopt.size;
+
     key->name = (void *)op_name;
-
-    k = bsearch(itnl_opt.index + itnl_opt.size, itnl_opt.index, itnl_opt.size, sizeof(*itnl_opt.index), flexop_comp);
-
+    k = bsearch(flexop_iopt.index + flexop_iopt.size, flexop_iopt.index, flexop_iopt.size,
+            sizeof(*flexop_iopt.index), flexop_comp);
     key->name = NULL;        /* reset key->name */
-    if (k == NULL)
-        flexop_error(1, "%s: unknown option \"-%s\"!\n", func, op_name);
 
-    o = itnl_opt.options + (*k);
+    if (k == NULL) flexop_error(1, "%s: unknown option \"-%s\"!\n", func, op_name);
+
+    o = flexop_iopt.options + (*k);
     if (type >= 0 && (int)o->type != type) {
         flexop_printf("%s: wrong function type for \"-%s\".", func, op_name);
         switch (o->type) {
@@ -1291,4 +1287,300 @@ FLEXOP_VEC * flexop_get_vec_string(const char *op_name)
     get_option(op_name, &value, VT_VEC_STRING, __func__);
 
     return value;
+}
+
+static int set_option(const char *op_name, void *value, int type, const char *func)
+{
+    int j, *k;
+    FLEXOP_KEY *o, *key;
+    char **pp;
+
+    if (!flexop_iopt.initialized)
+        flexop_error(1, "%s must be called after flexop_init!\n", func);
+
+    if (value == NULL) return 1;
+
+    if (op_name[0] == '-' || op_name[1] == '+') op_name++;
+
+    key = flexop_iopt.options + flexop_iopt.size;
+
+    key->name = (void *)op_name;
+    k = bsearch(flexop_iopt.index + flexop_iopt.size, flexop_iopt.index, flexop_iopt.size,
+            sizeof(*flexop_iopt.index), flexop_comp);
+
+    key->name = NULL;        /* reset key->name */
+
+    if (k == NULL) flexop_error(1, "%s: unknown option \"-%s\"!\n", func, op_name);
+
+    o = flexop_iopt.options + (*k);
+
+    if (type >= 0 && (int)o->type != type) {
+        flexop_printf("%s: wrong function type for \"-%s\".", func, op_name);
+        switch (o->type) {
+            case VT_NONE:
+                flexop_error(1, "Please use flexop_set_no_arg instead.\n");
+                break;
+
+            case VT_INT:
+                flexop_error(1, "Please use flexop_set_int instead.\n");
+                break;
+
+            case VT_FLOAT:
+                flexop_error(1, "Please use flexop_set_double instead.\n");
+                break;
+
+            case VT_STRING:
+                flexop_error(1, "Please use flexop_set_string instead.\n");
+                break;
+
+            case VT_KEYWORD:
+                flexop_error(1, "Please use flexop_set_keyword instead.\n");
+                break;
+
+            case VT_HANDLER:
+                flexop_error(1, "Please use flexop_set_handler instead.\n");
+                break;
+
+            case VT_VEC_INT:
+            case VT_VEC_FLOAT:
+            case VT_VEC_STRING:
+                flexop_error(1, "Please use flexop_set_handler instead.\n");
+                break;
+
+            default:
+                flexop_error(1, "No flexop_set_xyz function for \"-%s\".\n", op_name);
+                break;
+        }
+    }
+
+    switch (o->type) {
+        case VT_NONE:
+            *(int *)o->var = *(int *)value;
+            o->used = 1;
+            break;
+
+        case VT_INT:
+            *(FLEXOP_INT *)o->var = *(FLEXOP_INT *)value;
+            o->used = 1;
+            break;
+
+        case VT_FLOAT:
+            *(FLEXOP_FLOAT *)o->var = *(FLEXOP_FLOAT *)value;
+            o->used = 1;
+            break;
+
+        case VT_STRING:
+            flexop_free(*(char **)o->var);
+            *(char **)o->var = strdup((const char *)value);
+            o->used = 1;
+            break;
+
+        case VT_KEYWORD:
+            if (value == NULL) {
+                *(int *)o->var = -1;
+                o->used = 1;
+                break;
+            }
+
+            for (pp = o->keys; *pp != NULL; pp++)
+                if (!strcmp(*pp, value)) break;
+
+            if (*pp == NULL) {
+                flexop_printf("%s:%d, invalid argument \"%s\" "
+                        "for the option \"-%s\".\n", __FILE__, __LINE__, value, op_name);
+
+                flexop_printf("Valid keywords are: ");
+                for (pp = o->keys; *pp != NULL; pp++) flexop_printf("%s\"%s\"", pp == o->keys ? "":", ", *pp);
+
+                flexop_printf("\n");
+                flexop_error(1, "abort.\n");
+                break;
+            }
+
+            *(int *)o->var = pp - o->keys;
+            o->used = 1;
+            break;
+
+        case VT_HANDLER:
+            j = 0;
+            if (o->keys != NULL) {
+                flexop_free(o->keys[0]);
+                o->keys[0] = NULL;
+            }
+
+            o->keys = flexop_realloc(o->keys, (j + 2) * sizeof(*o->keys));
+            o->keys[j] = strdup(value);
+            o->keys[j + 1] = NULL;
+
+            /* call user supplied option handler */
+            if (o->var != NULL) {
+                if (!((FLEXOP_HANDLER)o->var)(o, value)) {
+                    flexop_printf("invalid argument for \"-%s\" option.\n", o->name);
+                    ((FLEXOP_HANDLER)o->var)(o, NULL);
+                    flexop_error(1, "abort.\n");
+                }
+            }
+
+            o->used = 1;
+            break;
+
+            case VT_VEC_INT:
+            {
+                FLEXOP_VEC *v;
+                FLEXOP_INT tp;
+                char *ta = NULL;
+                char *ip;
+
+                /* init vec */
+                v = o->var;
+                if (o->used && flexop_vec_initialized(v)) {
+                    flexop_vec_destroy(v);
+                    flexop_vec_init(v, VT_INT, -1, o->name);
+                }
+
+                /* parse */
+                ta = strdup(value);
+                ip = strtok(ta, " \t");
+
+                while (ip != NULL) {
+                    tp = flexop_atoi(ip);
+
+                    flexop_vec_add_entry(v, &tp);
+                    ip = strtok(NULL, " \t");
+                }
+
+                o->used = 1;
+                free(ta);
+            }
+
+            break;
+
+            case VT_VEC_FLOAT:
+                {
+                    FLEXOP_VEC *v;
+                    FLEXOP_FLOAT tp;
+                    char *ta = NULL;
+                    char *ip;
+
+                    /* init vec */
+                    v = o->var;
+                    if (o->used && flexop_vec_initialized(v)) {
+                        flexop_vec_destroy(v);
+                        flexop_vec_init(v, VT_FLOAT, -1, o->name);
+                    }
+                    
+                    /* parse */
+                    ta = strdup(value);
+                    ip = strtok(ta, " \t");
+
+                    while (ip != NULL) {
+                        tp = flexop_atof(ip);
+
+                        flexop_vec_add_entry(v, &tp);
+                        ip = strtok(NULL, " \t");
+                    }
+
+                    o->used = 1;
+                    free(ta);
+                }
+
+                break;
+
+            case VT_VEC_STRING:
+                {
+                    FLEXOP_VEC *v;
+                    char *ta = NULL;
+                    char *ip;
+
+                    /* init vec */
+                    v = o->var;
+                    if (o->used && flexop_vec_initialized(v)) {
+                        flexop_vec_destroy(v);
+                        flexop_vec_init(v, VT_STRING, -1, o->name);
+                    }
+                    
+                    /* parse */
+                    ta = strdup(value);
+                    ip = strtok(ta, " \t");
+
+                    while (ip != NULL) {
+                        flexop_vec_add_entry(v, ip);
+                        ip = strtok(NULL, " \t");
+                    }
+
+                    o->used = 1;
+                    free(ta);
+                }
+
+                break;
+
+        default:
+            /* not allowed */
+            flexop_error(1, "%s:%d: unsupported or unimplemented option type.\n", __FILE__, __LINE__);
+    }
+
+    return 1;
+}
+
+void flexop_set_options(const char *str)
+{
+    int i, argc = 0, argc_allocated = 0;
+    char **argv = NULL;
+
+    if (!flexop_iopt.initialized)
+        flexop_error(1, "%s must be called after flexop_init!\n", __func__);
+
+    if (str == NULL) return;
+
+    flexop_parse_options(&argc, &argv, &argc_allocated, str);
+    flexop_parse_cmdline(argc, &argv);
+
+    for (i = 0; i < argc; i++) flexop_free(argv[i]);
+
+    flexop_free(argv);
+}
+
+int flexop_set_no_arg(const char *op_name, int value)
+{
+    return set_option(op_name, &value, VT_NONE, __func__);
+}
+
+int flexop_set_int(const char *op_name, FLEXOP_INT value)
+{
+    return set_option(op_name, &value, VT_INT, __func__);
+}
+
+int flexop_set_float(const char *op_name, FLEXOP_FLOAT value)
+{
+    return set_option(op_name, &value, VT_FLOAT, __func__);
+}
+
+int flexop_set_keyword(const char *op_name, const char *value)
+{
+    return set_option(op_name, (void *)value, VT_KEYWORD, __func__);
+}
+
+int flexop_set_string(const char *op_name, const char *value)
+{
+    return set_option(op_name, (void *)value, VT_STRING, __func__);
+}
+
+int flexop_set_handler(const char *op_name, const char *value)
+{
+    return set_option(op_name, (void *)value, VT_HANDLER, __func__);
+}
+
+int flexop_set_vec_int(const char *op_name, const char *value)
+{
+    return set_option(op_name, &value, VT_VEC_INT, __func__);
+}
+
+int flexop_set_vec_float(const char *op_name, const char *value)
+{
+    return set_option(op_name, &value, VT_VEC_FLOAT, __func__);
+}
+
+int flexop_set_vec_string(const char *op_name, const char *value)
+{
+    return set_option(op_name, &value, VT_VEC_STRING, __func__);
 }

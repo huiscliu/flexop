@@ -38,7 +38,7 @@ void flexop_print_help(FLEXOP_KEY *o, const char *help);
 void flexop_help(void);
 
 void flexop_parse(int *argc, char ***argv);
-void flexop_parse_argv(int argc, char ***argv);
+void flexop_parse_cmdline(int argc, char ***argv);
 
 int flexop_get_no_arg(const char *op_name);
 FLEXOP_INT flexop_get_int(const char *op_name);
@@ -48,6 +48,17 @@ const char * flexop_get_string(const char *op_name);
 FLEXOP_VEC * flexop_get_vec_int(const char *op_name);
 FLEXOP_VEC * flexop_get_vec_float(const char *op_name);
 FLEXOP_VEC * flexop_get_vec_string(const char *op_name);
+
+void flexop_set_options(const char *str);
+int flexop_set_no_arg(const char *op_name, int value);
+int flexop_set_int(const char *op_name, FLEXOP_INT value);
+int flexop_set_float(const char *op_name, FLEXOP_FLOAT value);
+int flexop_set_keyword(const char *op_name, const char *value);
+int flexop_set_string(const char *op_name, const char *value);
+int flexop_set_handler(const char *op_name, const char *value);
+int flexop_set_vec_int(const char *op_name, const char *value);
+int flexop_set_vec_float(const char *op_name, const char *value);
+int flexop_set_vec_string(const char *op_name, const char *value);
 
 #ifdef __cplusplus
 }

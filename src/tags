@@ -13,12 +13,22 @@ flexop_comp	flexop.c	/^static int flexop_comp(const void *i0, const void *i1)$/;
 flexop_error	flexop-utils.c	/^void flexop_error(int code, const char *fmt, ...)$/;"	f
 flexop_finalize	flexop.c	/^void flexop_finalize(void)$/;"	f
 flexop_free	flexop-utils.c	/^void flexop_free(void *ptr)$/;"	f
+flexop_get_float	flexop.c	/^FLEXOP_FLOAT flexop_get_float(const char *op_name)$/;"	f
+flexop_get_int	flexop.c	/^FLEXOP_INT flexop_get_int(const char *op_name)$/;"	f
+flexop_get_keyword	flexop.c	/^const char * flexop_get_keyword(const char *op_name)$/;"	f
+flexop_get_no_arg	flexop.c	/^int flexop_get_no_arg(const char *op_name)$/;"	f
+flexop_get_string	flexop.c	/^const char * flexop_get_string(const char *op_name)$/;"	f
+flexop_get_vec_float	flexop.c	/^FLEXOP_VEC * flexop_get_vec_float(const char *op_name)$/;"	f
+flexop_get_vec_int	flexop.c	/^FLEXOP_VEC * flexop_get_vec_int(const char *op_name)$/;"	f
+flexop_get_vec_string	flexop.c	/^FLEXOP_VEC * flexop_get_vec_string(const char *op_name)$/;"	f
 flexop_help	flexop.c	/^void flexop_help(void)$/;"	f
 flexop_init	flexop.c	/^void flexop_init(int *argc, char ***argv)$/;"	f
 flexop_key_destroy	flexop.c	/^static void flexop_key_destroy(FLEXOP_KEY *o)$/;"	f	file:
 flexop_parse	flexop.c	/^void flexop_parse(int *argc, char ***argv)$/;"	f
 flexop_parse_cmdline	flexop.c	/^void flexop_parse_cmdline(int argc, char ***argv)$/;"	f
 flexop_parse_options	flexop.c	/^void flexop_parse_options(int *argc, char ***argv, int *alloc, const char *optstr)$/;"	f
+flexop_parse_options_file	flexop.c	/^void flexop_parse_options_file(const char *fn)$/;"	f
+flexop_preset	flexop.c	/^void flexop_preset(const char *str)$/;"	f
 flexop_print_help	flexop.c	/^void flexop_print_help(FLEXOP_KEY *o, const char *help)$/;"	f
 flexop_printf	flexop-utils.c	/^int flexop_printf(const char *fmt, ...)$/;"	f
 flexop_realloc	flexop-utils.c	/^void * flexop_realloc(void *ptr, size_t size)$/;"	f
@@ -35,6 +45,13 @@ flexop_register_vec_float	flexop.c	/^void flexop_register_vec_float(const char *
 flexop_register_vec_int	flexop.c	/^void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var)$/;"	f
 flexop_register_vec_string	flexop.c	/^void flexop_register_vec_string(const char *name, const char *help, FLEXOP_VEC *var)$/;"	f
 flexop_reset	flexop.c	/^void flexop_reset(FLEXOP *opt)$/;"	f
+flexop_set_double	flexop.c	/^int flexop_set_double(const char *op_name, FLEXOP_FLOAT value)$/;"	f
+flexop_set_handler	flexop.c	/^int flexop_set_handler(const char *op_name, const char *value)$/;"	f
+flexop_set_int	flexop.c	/^int flexop_set_int(const char *op_name, FLEXOP_INT value)$/;"	f
+flexop_set_keyword	flexop.c	/^int flexop_set_keyword(const char *op_name, const char *value)$/;"	f
+flexop_set_no_arg	flexop.c	/^int flexop_set_no_arg(const char *op_name, int value)$/;"	f
+flexop_set_options	flexop.c	/^void flexop_set_options(const char *str)$/;"	f
+flexop_set_string	flexop.c	/^int flexop_set_string(const char *op_name, const char *value)$/;"	f
 flexop_show_cmdline	flexop.c	/^void flexop_show_cmdline(void)$/;"	f
 flexop_show_used	flexop.c	/^void flexop_show_used(void)$/;"	f
 flexop_sort	flexop.c	/^void flexop_sort(FLEXOP *opt)$/;"	f
@@ -48,4 +65,6 @@ flexop_vec_int_get_value	flexop-vec.c	/^FLEXOP_INT flexop_vec_int_get_value(FLEX
 flexop_vec_print	flexop-vec.c	/^void flexop_vec_print(FLEXOP_VEC *v)$/;"	f
 flexop_vec_string_get_value	flexop-vec.c	/^char * flexop_vec_string_get_value(FLEXOP_VEC *v, FLEXOP_INT n)$/;"	f
 flexop_warning	flexop-utils.c	/^void flexop_warning(const char *fmt, ...)$/;"	f
+get_option	flexop.c	/^static int get_option(const char *op_name, void **pvar, int type, const char *func)$/;"	f	file:
 itnl_opt	flexop.c	/^static FLEXOP itnl_opt;$/;"	v	file:
+set_option	flexop.c	/^static int set_option(const char *op_name, void *value, int type, const char *func)$/;"	f	file:
