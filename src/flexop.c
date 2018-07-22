@@ -1599,15 +1599,15 @@ int flexop_set_handler(const char *op_name, const char *value)
 
 int flexop_set_vec_int(const char *op_name, const char *value)
 {
-    return set_option(op_name, &value, VT_VEC_INT, __func__);
+    return set_option(op_name, (void *)value, VT_VEC_INT, __func__);
 }
 
 int flexop_set_vec_float(const char *op_name, const char *value)
 {
-    return set_option(op_name, &value, VT_VEC_FLOAT, __func__);
+    return set_option(op_name, (void *)value, VT_VEC_FLOAT, __func__);
 }
 
 int flexop_set_vec_string(const char *op_name, const char *value)
 {
-    return set_option(op_name, &value, VT_VEC_STRING, __func__);
+    return set_option(op_name, (void *)value, VT_VEC_STRING, __func__);
 }
