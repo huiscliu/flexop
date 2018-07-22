@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     flexop_register_vec_float("vf", "vector of float", &vf);
     flexop_register_vec_string("vs", "vector of string", &vs);
 
-    /* init */
+    /* init, parse */
     flexop_init(&argc, &argv);
 
     flexop_printf("Parsed parameters:\n");
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     flexop_vec_print(&vs);
     flexop_printf("----------------------------------\n\n\n");
 
-    /* set option */
+    /* set option, change parsed options */
     flexop_set_int("i", 8);
     flexop_set_float("f", 1.11111);
     flexop_set_string("s", "usa");
