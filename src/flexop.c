@@ -381,13 +381,29 @@ void flexop_show_cmdline(void)
 {
     int i;
 
-    if (flexop_iopt.argc <= 0) return;
+    if (flexop_iopt.argc > 0) {
+        flexop_printf("Command-line:");
 
-    flexop_printf("Command-line:");
+        for (i = 0; i < flexop_iopt.argc; i++) flexop_printf(" %s", flexop_iopt.argv[i]);
 
-    for (i = 0; i < flexop_iopt.argc; i++) flexop_printf(" %s", flexop_iopt.argv[i]);
+        flexop_printf("\n");
+    }
 
-    flexop_printf("\n");
+    if (flexop_iopt.argcp > 0) {
+        flexop_printf("Preset:");
+
+        for (i = 0; i < flexop_iopt.argcp; i++) flexop_printf(" %s", flexop_iopt.argvp[i]);
+
+        flexop_printf("\n");
+    }
+
+    if (flexop_iopt.argcf > 0) {
+        flexop_printf("Option file:");
+
+        for (i = 0; i < flexop_iopt.argcf; i++) flexop_printf(" %s", flexop_iopt.argvf[i]);
+
+        flexop_printf("\n");
+    }
 }
 
 /* prints all options which have been called by the user */
@@ -776,8 +792,7 @@ void flexop_parse_options(int *argc, char ***argv, int *alloc, const char *optst
 void flexop_parse_options_file(const char *fn)
 {
     FILE *f;
-    int i, argc = 0, allocated = 0;
-    char *p, **argv = NULL, buffer[4096];
+    char *p, buffer[4096];
 
     if ((f = fopen(fn, "r")) == NULL) {
         flexop_printf("flexop: cannot open options file \"%s\".\n", fn);
@@ -792,21 +807,17 @@ void flexop_parse_options_file(const char *fn)
 
         if (*p == '#' || *p == '\0') continue;
 
-        flexop_parse_options(&argc, &argv, &allocated, p);
+        flexop_parse_options(&flexop_iopt.argcf, &flexop_iopt.argvf, &flexop_iopt.allocf, p);
     }
 
     fclose(f);
 
-    if (allocated == 0) return;
+    if (flexop_iopt.argcf == 0) return;
 
-    argv[argc] = NULL;
+    flexop_iopt.argvf[flexop_iopt.argcf] = NULL;
 
     /* parse */
-    flexop_parse_cmdline(argc, &argv);
-
-    /* clean */
-    for (i = 0; i < argc; i++) flexop_free(argv[i]);
-    flexop_free(argv);
+    flexop_parse_cmdline(flexop_iopt.argcf, &flexop_iopt.argvf);
 }
 
 /* parses cmdline parameters, processes and removes known options from
@@ -1077,13 +1088,6 @@ void flexop_parse(int *argc, char ***argv)
     /* handle preset options */
     flexop_parse_cmdline(flexop_iopt.argcp, &flexop_iopt.argvp);
 
-    /* clean up */
-    for (i = 0; i < flexop_iopt.argcp; i++) {
-        free(flexop_iopt.argvp[i]);
-    }
-
-    if (flexop_iopt.argcp > 0) flexop_free(flexop_iopt.argvp);
-
     /* handle command line */
     assert(*argc > 0);
     flexop_iopt.argc = *argc - 1;
@@ -1116,7 +1120,30 @@ void flexop_init(int *argc, char ***argv)
 
 void flexop_finalize(void)
 {
+    int i;
+
     flexop_reset(&flexop_iopt);
+
+    /* clean up, argv */
+    for (i = 0; i < flexop_iopt.argc; i++) {
+        free(flexop_iopt.argv[i]);
+    }
+
+    if (flexop_iopt.argc > 0) flexop_free(flexop_iopt.argv);
+
+    /* clean up, argvp */
+    for (i = 0; i < flexop_iopt.argcp; i++) {
+        free(flexop_iopt.argvp[i]);
+    }
+
+    if (flexop_iopt.argcp > 0) flexop_free(flexop_iopt.argvp);
+
+    /* clean up, argvf */
+    for (i = 0; i < flexop_iopt.argcf; i++) {
+        free(flexop_iopt.argvf[i]);
+    }
+
+    if (flexop_iopt.argcf > 0) flexop_free(flexop_iopt.argvf);
 
     flexop_iopt.initialized = 0;
 }

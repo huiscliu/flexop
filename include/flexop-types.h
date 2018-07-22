@@ -113,6 +113,11 @@ typedef struct FLEXOP_
     char **argvp;
     int allocp;
 
+    /* file */
+    int argcf;
+    char **argvf;
+    int allocf;
+
     size_t size;
     size_t alloc;
     int initialized;
