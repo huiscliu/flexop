@@ -34,13 +34,13 @@ typedef int               FLEXOP_INT;
  * o->var points to the location of the variable with one of the following
  * types:
  *
- * - For VT_INT, o->var is intepreted as (INT *)o->var
+ * - For VT_INT, o->var is intepreted as (FLEXOP_INT *)o->var
  *
- * - For VT_FLOAT, o->var is intepreted as (double *)o->var
+ * - For VT_FLOAT, o->var is intepreted as (FLEXOP_FLOAT *)o->var
  *
  * - For options without argument (VT_NONE), o->var is intepreted as
- *   (int *)o->var, the cmdline option '-name' sets it to TRUE,
- *   and '+name' sets it to FALSE.
+ *   (int *)o->var, the cmdline option '-name' sets it to (1) TRUE,
+ *   and '+name' sets it to (0) FALSE.
  *
  * - For VT_STRING, o->var is intepreted as (const char **)o->var, i.e.,
  *   it points to the address of the string pointer, calling the option
@@ -50,7 +50,11 @@ typedef int               FLEXOP_INT;
  *
  * - For VT_KEYWORD, o->keys is a NULL terminated list of valid keywords
  *   for this option, and o->var o->var is intepreted as (int *)o->var
- *   which is an index to the list of keywords */
+ *   which is an index to the list of keywords 
+ *
+ * - For VT_VEC_INT (_FLOAT or _STRING),  o->var is intepreted as (FLEXOP_VEC *)o->var 
+ *
+ */
 
 typedef enum {
     VT_INIT,
@@ -73,18 +77,21 @@ typedef enum {
 
 typedef struct FLEXOP_KEY
 {
-    char  *name;    /* option name without leading dash */
-    char  *help;    /* help text for this option */
-    char  **keys;   /* list of key words if type is VT_KEYWORD */
-    void  *var;     /* address of the variable to assign value to
-                       It's assumed to have the following type:
-                       - VT_HANDLER  (FLEXOP_HANDLER)var
-                       - VT_FILENAME  (const char **)var
-                       - VT_STRING  (const char **)var
-                       - VT_KEYWORD  (int *)var
-                       - VT_INT  (INT *)var
-                       - VT_FLOAT  (double *)var
-                       - VT_NONE  (int *)var */
+    char  *name;        /* option name without leading dash */
+    char  *help;        /* help text for this option */
+    char  **keys;       /* list of key words if type is VT_KEYWORD */
+    void  *var;         /* address of the variable to assign value to
+                           It's assumed to have the following type:
+                               - VT_HANDLER  (FLEXOP_HANDLER)var
+                               - VT_FILENAME  (const char **)var
+                               - VT_STRING  (const char **)var
+                               - VT_KEYWORD  (int *)var
+                               - VT_INT  (FLEXOP_INT *)var
+                               - VT_FLOAT  (FLEXOP_FLOAT *)var
+                               - VT_VEC_INT  (FLEXOP_VEC *)var
+                               - VT_VEC_FLOAT  (FLEXOP_VEC *)var
+                               - VT_VEC_STRING  (FLEXOP_VEC *)var
+                               - VT_NONE  (int *)var */
 
     FLEXOP_VTYPE type;  /* type of the variable */
     int  used;          /* whether the option is specified in cmdline */
@@ -94,7 +101,8 @@ typedef struct FLEXOP_KEY
 /* Option handling function protocol.
  * 'optname' is the name of the option,
  * 'optstr' is the option string (NULL ==> print help).
- * Returns FALSE if error. */
+ * Returns (0) FALSE if error.
+ * Returns (1) TRUE if succeed. */
 typedef int (*FLEXOP_HANDLER)(FLEXOP_KEY *o, const char *arg);
 
 typedef struct FLEXOP_

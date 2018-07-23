@@ -5,7 +5,6 @@
 #define FLEXOP_USE_LONG         0
 #define FLEXOP_USE_LONG_LONG    0
 #define IFMT                    "d"
-#define XFMT                    "ld"
 
 #define FLEXOP_USE_LONG_DOUBLE  0
 #define FFMT                    "g"
