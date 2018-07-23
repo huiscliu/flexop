@@ -9,7 +9,7 @@ The initial code was from PHG project (option.h and option.c, http://lsec.cc.ac.
 # Purpose
 The purpose of this project is to provide a standalone command line parsing framework under Linux, Unix and Mac such that any application can easily support command line options by using this library.
 
-This project has refactorized original code, deleted some types, changed work flow, and added new types have.
+This project has refactorized original code, deleted some types, changed work flow, and added new types.
 
 The following demo shows options for integer, floating point number, string, vector of integer, vector of floating point number and vector of strings, and details can be found in example/example.c:
 ```
