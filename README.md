@@ -11,8 +11,8 @@ The purpose of this project is to provide a standalone command line parsing fram
 
 This project has refactorized original code, deleted some types, changed work flow, and added new types have.
 
-Demo:
+The following demo shows options for integer, floating point number, string, vector of integer, vector of floating point number and vector of strings, and details can be found in example/example.c:
 ```
-./example -i 1 -f 1.2 -s "hi"
+./example -i 1 -f 1.2 -s "hi" -vi "1 2 3 5" -vf "1.3 2e-4 3.333" -vs "hi jill and jack"
 
 ```
