@@ -16,3 +16,45 @@ The following demo shows options for integer, floating point number, string, vec
 ./example -i 1 -f 1.2 -s "hi" -vi "1 2 3 5" -vf "1.3 2e-4 3.333" -vs "hi jill and jack"
 
 ```
+
+# Build
+The simplest way to install is to run commands:
+```
+ ./configure
+ make
+ sudo make install
+```
+
+The default destination is **/usr/local/flexop/**. However, the destination can be changed by using command:
+```
+ ./configure --prefix=DES_PATH
+```
+
+By this, the library will be installed to **DES_PATH**.
+
+
+## Configure
+The script **configure** has a few parameters:
+```
+./configure --help
+
+Installation directories:
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+                          [/usr/local/flexop]
+
+By default, ake install' will install all the files in
+usr/local/flexop/bin', usr/local/flexop/lib' etc.  You can specify
+an installation prefix other than usr/local/flexop' using 
+
+Optional Features:
+  --disable-option-checking  ignore unrecognized --enable/--with options
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --disable-assert        turn off assertions
+  --enable-big-int        use long int for INT
+  --disable-big-int       use int for INT (default),
+  --with-int=type         integer type(long|long long)
+  --enable-long-double    use long double for FLOAT
+  --disable-long-double   use double for FLOAT (default)
+
+```
