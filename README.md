@@ -5,8 +5,8 @@ A Flexible Command Line Parsing Framework. Initial code was from PHG project (op
 This project has refactorized original code and new types have been supported.
 
 Demo:
-'''
+```
 
  ./example -i 1 -f 1.2 -s "hi"
 
-'''
+```
