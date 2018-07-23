@@ -1436,8 +1436,9 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
             if (o->var != NULL) {
                 if (!((FLEXOP_HANDLER)o->var)(o, value)) {
                     flexop_printf("invalid argument for \"-%s\" option.\n", o->name);
+
                     ((FLEXOP_HANDLER)o->var)(o, NULL);
-                    flexop_error(1, "abort.\n");
+                    flexop_error(1, "flexop: abort.\n");
                 }
             }
 
