@@ -58,3 +58,5 @@ Optional Features:
   --disable-long-double   use double for FLOAT (default)
 
 ```
+
+The default integer type is **int** and the default floating point number is **double**. User can change integer and floating point number types, suchas **./configure --enable-big-int --with-int="long"** for **long int**, **./configure --enable-big-int --with-int="long long"** for **long long int**, **./configure --enable-long-double"** for **long double**.
