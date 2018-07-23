@@ -11,7 +11,7 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
     flexop_free(o->help);
     o->name = o->help = NULL;
 
-    if (o->type == VT_STRING) {
+    if (o->type == VT_STRING && o->used) {
         flexop_free(*(char **)o->var);
         *(char **)o->var = NULL;
     }
@@ -96,20 +96,13 @@ static void flexop_register(const char *name, const char *help, const char **key
     o->type = type;
     o->used = 0;
 
-    if (type == VT_STRING) {
-        if (*(char **)o->var != NULL) {
-            /* duplicate the string (it is then safe to free it) */
-            *((char **)o->var) = strdup(*(char **)o->var);
-        }
-    }
-    else if (type == VT_KEYWORD) {
+    if (type == VT_KEYWORD) {
         /* make a copy of the keywords list */
         const char **p;
         char **q;
 
         if (keys == NULL) {
-            flexop_printf("flexop_register_keyword(): keys should not be NULL "
-                    "(option \"-%s\").\n", name);
+            flexop_printf("flexop_register_keyword(): keys should not be NULL (option \"-%s\").\n", name);
             flexop_printf("Option not registered.\n");
             flexop_key_destroy(flexop_iopt.options + flexop_iopt.size);
             flexop_iopt.size--;
@@ -168,8 +161,7 @@ void flexop_register_string(const char *name, const char *help, char **var)
     flexop_register(name, help, NULL, var, VT_STRING);
 }
 
-void flexop_register_keyword(const char *name, const char *help,
-        const char **keys, int *var)
+void flexop_register_keyword(const char *name, const char *help, const char **keys, int *var)
 {
     flexop_register(name, help, keys, var, VT_KEYWORD);
 }
@@ -893,7 +885,8 @@ void flexop_parse_cmdline(int argc, char ***argv)
 
             case VT_STRING:
                 p = *(char **)o->var;
-                flexop_free(*(char **)o->var);
+                if (o->used) flexop_free(*(char **)o->var);
+
                 *(char **)o->var = strdup(arg);
                 o->used = 1;
                 break;
@@ -1129,7 +1122,7 @@ void flexop_finalize(void)
         free(flexop_iopt.argv[i]);
     }
 
-    if (flexop_iopt.argc > 0) flexop_free(flexop_iopt.argv);
+    flexop_free(flexop_iopt.argv);
 
     /* clean up, argvp */
     for (i = 0; i < flexop_iopt.argcp; i++) {

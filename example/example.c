@@ -11,6 +11,8 @@ int main(int argc, char **argv)
     FLEXOP_VEC vf;
     FLEXOP_VEC vs;
 
+    int no_arg = 0;
+
     char *p_i = "-i 22";
     char *p_f = "-f 1.2";
     char *p_s = "-s hello";
@@ -18,6 +20,9 @@ int main(int argc, char **argv)
     char *p_vi = "-vi \" 1 2 1 3 1 4\"";
     char *p_vf = "-vf \" 0.1 2e-3 1.2 3.33333 2.1 3.4\"";
     char *p_vs = "-vs \" hello this world\"";
+
+    const char *keys[] = {"one", "two", "three", "four", NULL};
+    int order = 0;
 
     /* preset values */
     flexop_preset(p_i);
@@ -43,9 +48,13 @@ int main(int argc, char **argv)
     flexop_register_int("i", "int", &i);
     flexop_register_float("f", "float", &f);
     flexop_register_string("s", "string", &s);
+
     flexop_register_vec_int("vi", "vector of int", &vi);
     flexop_register_vec_float("vf", "vector of float", &vf);
     flexop_register_vec_string("vs", "vector of string", &vs);
+
+    flexop_register_no_arg("noarg", "bool value", &no_arg);
+    flexop_register_keyword("order", "order of digital number", keys, &order);
 
     /* init, parse */
     flexop_init(&argc, &argv);
@@ -59,6 +68,14 @@ int main(int argc, char **argv)
     flexop_vec_print(&vi);
     flexop_vec_print(&vf);
     flexop_vec_print(&vs);
+
+    if (no_arg) {
+        flexop_printf("flexop: key: \"noarg\": value: true\n");
+    }
+    else {
+        flexop_printf("flexop: key: \"noarg\": value: false\n");
+    }
+
     flexop_printf("----------------------------------\n\n\n");
 
     /* set option, change parsed options */
