@@ -4,7 +4,7 @@ In many applications, such as "ls (a Linux command to list files)", it accepts l
 
 
 # Credit
-The initial code was from PHG project (option.h and option.c, http://lsec.cc.ac.cn/phg/), which was a parallel library for adaptive finite element methods and adaptive finite volume methods. It has been developed for more than 10 years and it has been applied in various areas.
+The initial code is from PHG project (option.h and option.c, http://lsec.cc.ac.cn/phg/), which is a parallel library for adaptive finite element methods and adaptive finite volume methods. It has been developed for more than 10 years and it has been applied in various areas.
 
 # Purpose
 The purpose of this project is to provide a standalone command line parsing framework under Linux, Unix and Mac such that any application can easily support command line options by using this library.
