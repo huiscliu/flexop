@@ -18,15 +18,10 @@ libdir		= @libdir@
 includedir	= @includedir@
 RPATH_FLAG	= @RPATH_FLAG@
 
-.c.o:
+%.o : %.c
 	${CC} -c $*.c ${CFLAGS} ${CPPFLAGS}
 	@echo
 
 % : %.o
 	${LINKER} -o $@ $*.o ${LDFLAGS} ${LIBS}
-	@echo
-
-% : %.c
-	${CC} ${CFLAGS} ${CPPFLAGS} -c $*.c
-	${LINKER} ${LDFLAGS} -o $@ $*.o ${LIBS}
 	@echo
