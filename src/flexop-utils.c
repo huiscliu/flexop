@@ -1,6 +1,8 @@
 
 #include "flexop-utils.h"
 
+static int flexop_print = 1;
+
 void flexop_warning(const char *fmt, ...)
 {
     va_list ap;
@@ -30,6 +32,8 @@ int flexop_printf(const char *fmt, ...)
 {
     va_list ap;
     int ret = 0;
+
+    if (!flexop_print) return 0;
 
     va_start(ap, fmt);
     ret = vprintf(fmt, ap);
@@ -120,3 +124,14 @@ FLEXOP_INT flexop_atoi(const char *ptr)
 
     return t;
 }
+
+void flexop_set_print_mark(int m)
+{
+    if (m) {
+        flexop_print = 1;
+    }
+    else {
+        flexop_print = 0;
+    }
+}
+
