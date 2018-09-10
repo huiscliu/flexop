@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     FLEXOP_VEC vf;
     FLEXOP_VEC vs;
 
-    int no_arg = 0;
+    int bol = 0;
 
     char *p_i = "-i 22";
     char *p_f = "-f 1.2";
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 
     /* register bool key words */
     flexop_register_title("No arguement", "", "noarg");
-    flexop_register_no_arg("noarg", "bool value", &no_arg);
+    flexop_register_bool("noarg", "bool value", &bol);
 
     /* register "keyword" key words */
     flexop_register_title("Keyword", "", "keyword");
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
     flexop_vec_print(&vs);
 
     /* no arguement */
-    if (no_arg) {
+    if (bol) {
         flexop_printf("flexop: key: \"noarg\": value: true\n");
     }
     else {
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     flexop_set_vec_float("vf", "11.11 2.2 3.1 4.4 4e-8");
     flexop_set_vec_string("vs", "a b c d z f g g g gg hi jill hill");
     flexop_set_keyword("order", "three");
-    flexop_set_no_arg("noarg", 1);
+    flexop_set_bool("noarg", 1);
     flexop_set_handler("stof", "1.34e-2");
 
     flexop_printf("Changed parsed parameters through set option:\n");
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     flexop_vec_print(&vs);
 
     /* no arguement */
-    if (no_arg) {
+    if (bol) {
         flexop_printf("flexop: key: \"noarg\": value: true\n");
     }
     else {

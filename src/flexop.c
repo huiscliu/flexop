@@ -141,9 +141,9 @@ static void flexop_register(const char *name, const char *help, const char **key
 }
 
 /* Wrapper functions for enforcing prototype checking */
-void flexop_register_no_arg(const char *name, const char *help, int *var)
+void flexop_register_bool(const char *name, const char *help, int *var)
 {
-    flexop_register(name, help, NULL, var, VT_NONE);
+    flexop_register(name, help, NULL, var, VT_BOOL);
 }
 
 void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var)
@@ -217,7 +217,7 @@ void flexop_sort(FLEXOP *opt)
     if (opt->sorted) return;
 
     /* append a dummy entry at the end of the list as the key for bsearch */
-    flexop_register("dummy", NULL, NULL, NULL, VT_NONE);
+    flexop_register("dummy", NULL, NULL, NULL, VT_BOOL);
     opt->index = flexop_alloc(opt->size * sizeof(*opt->index));
 
     for (i = 0; i < (int)opt->size; i++) opt->index[i] = i;
@@ -315,7 +315,7 @@ void flexop_print_help(FLEXOP_KEY *o, const char *help)
         *(p++) = '"';
         *(p++) = '>';
     }
-    else if (o->type == VT_NONE) {
+    else if (o->type == VT_BOOL) {
         p0 = " (the opposite option is \"+%s\")";
         len = strlen(p0) - 2 + strlen(o->name);;
 
@@ -422,7 +422,7 @@ void flexop_show_used(void)
                 flexop_error(1, "unexpected.\n");
                 break;
 
-            case VT_NONE:
+            case VT_BOOL:
                 flexop_printf("* %s: %s\n", o->help == NULL ? o->name : o->help,
                         *(int *)o->var == 1 ? "True" : "False");
                 break;
@@ -567,7 +567,7 @@ void flexop_help(void)
                 flexop_error(1, "unexpected.\n");
                 break;
 
-            case VT_NONE:
+            case VT_BOOL:
                 flexop_printf("  -%s (%s)", o->name, *(int *)o->var ? "True" : "False");
                 break;
 
@@ -853,7 +853,7 @@ void flexop_parse_cmdline(int argc, char ***argv)
         o = flexop_iopt.options + (*k);
 
         /* process option */
-        if (o->type != VT_NONE) {
+        if (o->type != VT_BOOL) {
             if (arg == NULL && (arg = (*argv)[++i]) == NULL) {
                 if (!strcmp(o->name, flexop_iopt.help_category = strdup("help"))) {
                     flexop_printf("Missing argument for option \"%s\".\n", p);
@@ -868,7 +868,7 @@ void flexop_parse_cmdline(int argc, char ***argv)
                 flexop_error(1, "unexpected.\n");
                 break;
 
-            case VT_NONE:
+            case VT_BOOL:
                 *(int *)o->var = (p[0] == '-' ? 1 : 0);
                 o->used = 1;
                 break;
@@ -1062,7 +1062,7 @@ void flexop_parse(int *argc, char ***argv)
     /* register internal opt */
     if (flexop_iopt.options == NULL) {
         /* this will register the options '-help' */
-        flexop_register(NULL, NULL, NULL, NULL, VT_NONE);
+        flexop_register(NULL, NULL, NULL, NULL, VT_BOOL);
     }
 
     flexop_sort(&flexop_iopt);
@@ -1165,8 +1165,8 @@ static int get_option(const char *op_name, void **pvar, int type, const char *fu
     if (type >= 0 && (int)o->type != type) {
         flexop_printf("%s: wrong function type for \"-%s\".", func, op_name);
         switch (o->type) {
-            case VT_NONE:
-                flexop_error(1, "Please use flexop_get_no_arg instead.\n");
+            case VT_BOOL:
+                flexop_error(1, "Please use flexop_get_bool instead.\n");
                 break;
 
             case VT_INT:
@@ -1209,7 +1209,7 @@ static int get_option(const char *op_name, void **pvar, int type, const char *fu
 
     *pvar = NULL;
     switch (o->type) {
-        case VT_NONE:
+        case VT_BOOL:
         case VT_INT:
         case VT_FLOAT:
             *pvar = o->var;
@@ -1237,11 +1237,11 @@ static int get_option(const char *op_name, void **pvar, int type, const char *fu
     return *pvar == NULL ? 0 : 1;
 }
 
-int flexop_get_no_arg(const char *op_name)
+int flexop_get_bool(const char *op_name)
 {
     void *value;
 
-    get_option(op_name, &value, VT_NONE, __func__);
+    get_option(op_name, &value, VT_BOOL, __func__);
 
     return *(int *)value;
 }
@@ -1337,8 +1337,8 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
     if (type >= 0 && (int)o->type != type) {
         flexop_printf("%s: wrong function type for \"-%s\".", func, op_name);
         switch (o->type) {
-            case VT_NONE:
-                flexop_error(1, "Please use flexop_set_no_arg instead.\n");
+            case VT_BOOL:
+                flexop_error(1, "Please use flexop_set_bool instead.\n");
                 break;
 
             case VT_INT:
@@ -1374,7 +1374,7 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
     }
 
     switch (o->type) {
-        case VT_NONE:
+        case VT_BOOL:
             *(int *)o->var = *(int *)value;
             o->used = 1;
             break;
@@ -1561,9 +1561,9 @@ void flexop_set_options(const char *str)
     flexop_free(argv);
 }
 
-int flexop_set_no_arg(const char *op_name, int value)
+int flexop_set_bool(const char *op_name, int value)
 {
-    return set_option(op_name, &value, VT_NONE, __func__);
+    return set_option(op_name, &value, VT_BOOL, __func__);
 }
 
 int flexop_set_int(const char *op_name, FLEXOP_INT value)

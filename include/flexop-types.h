@@ -38,7 +38,7 @@ typedef int               FLEXOP_INT;
  *
  * - For VT_FLOAT, o->var is intepreted as (FLEXOP_FLOAT *)o->var
  *
- * - For options without argument (VT_NONE), o->var is intepreted as
+ * - For options without argument (VT_BOOL), o->var is intepreted as
  *   (int *)o->var, the cmdline option '-name' sets it to (1) TRUE,
  *   and '+name' sets it to (0) FALSE.
  *
@@ -58,7 +58,7 @@ typedef int               FLEXOP_INT;
 
 typedef enum {
     VT_INIT,
-    VT_NONE,
+    VT_BOOL,
 
     VT_TITLE,
 
@@ -91,7 +91,7 @@ typedef struct FLEXOP_KEY
                                - VT_VEC_INT  (FLEXOP_VEC *)var
                                - VT_VEC_FLOAT  (FLEXOP_VEC *)var
                                - VT_VEC_STRING  (FLEXOP_VEC *)var
-                               - VT_NONE  (int *)var */
+                               - VT_BOOL  (int *)var */
 
     FLEXOP_VTYPE type;  /* type of the variable */
     int  used;          /* whether the option is specified in cmdline */
@@ -147,7 +147,6 @@ typedef struct FLEXOP_VEC_
     FLEXOP_INT magic;
 
 } FLEXOP_VEC;
-
 
 #ifdef __cplusplus
 extern "C" {
