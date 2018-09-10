@@ -38,16 +38,17 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
     }
 }
 
-void flexop_preset(const char *str)
+void flexop_preset_cmd_options(const char *str)
 {
     if (flexop_iopt.initialized) {
-        flexop_error(1, "flexop_preset must be called before flexop_init!\n");
+        flexop_error(1, "flexop_preset_cmd_options must be called before flexop_init!\n");
     }
 
     flexop_parse_options(&flexop_iopt.argcp, &flexop_iopt.argvp, &flexop_iopt.allocp, str);
 }
 
-static void flexop_register(const char *name, const char *help, const char **keys, void *var, FLEXOP_VTYPE type)
+static void flexop_register(const char *name, const char *help, const char **keys, void *var, void *hvar,
+        FLEXOP_VTYPE type)
 {
     FLEXOP_KEY *o;
     static int initialized = 0;
@@ -61,16 +62,16 @@ static void flexop_register(const char *name, const char *help, const char **key
         initialized = 1;
 
         /* Register title for user options */
-        flexop_register("\nUser options:", "\n", NULL, "user", VT_TITLE);
+        flexop_register("\nUser options:", "\n", NULL, "user", NULL, VT_TITLE);
         flexop_iopt.sorted = 0;
     }
     else if (type == VT_INIT) {
         /* register some global options */
         initialized = 1;
-        flexop_register("\nGeneric options:", "\n", NULL, "generic", VT_TITLE);
+        flexop_register("\nGeneric options:", "\n", NULL, "generic", NULL, VT_TITLE);
 
-        flexop_register("-help", "Print options help then exit", NULL, &flexop_iopt.help_category, VT_STRING);
-        flexop_register("-option_file", "Options file", NULL, &flexop_iopt.opt_file, VT_STRING);
+        flexop_register("-help", "Print options help then exit", NULL, &flexop_iopt.help_category, NULL, VT_STRING);
+        flexop_register("-option_file", "Options file", NULL, &flexop_iopt.opt_file, NULL, VT_STRING);
 
         flexop_iopt.sorted = 0;
 
@@ -104,6 +105,7 @@ static void flexop_register(const char *name, const char *help, const char **key
     o->help = help == NULL ? NULL : strdup(help);
     o->keys = NULL;
     o->var = var;
+    o->hvar = hvar;
     o->type = type;
     o->used = 0;
 
@@ -128,7 +130,7 @@ static void flexop_register(const char *name, const char *help, const char **key
 
         for (p = keys; *p != NULL; p++);
 
-        o->keys = flexop_alloc((p - keys + 1) * sizeof(*keys));
+        o->keys = flexop_malloc((p - keys + 1) * sizeof(*keys));
 
         for (p = keys, q = o->keys; *p != NULL; p++, q++) {
             if ((*p)[0] == '\0') {
@@ -157,63 +159,63 @@ static void flexop_register(const char *name, const char *help, const char **key
 /* Wrapper functions for enforcing prototype checking */
 void flexop_register_bool(const char *name, const char *help, int *var)
 {
-    flexop_register(name, help, NULL, var, VT_BOOL);
+    flexop_register(name, help, NULL, var, NULL, VT_BOOL);
 }
 
 void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var)
 {
-    flexop_register(name, help, NULL, var, VT_INT);
+    flexop_register(name, help, NULL, var, NULL, VT_INT);
 }
 
 void flexop_register_uint(const char *name, const char *help, FLEXOP_UINT *var)
 {
-    flexop_register(name, help, NULL, var, VT_UINT);
+    flexop_register(name, help, NULL, var, NULL, VT_UINT);
 }
 
 void flexop_register_float(const char *name, const char *help, FLEXOP_FLOAT *var)
 {
-    flexop_register(name, help, NULL, var, VT_FLOAT);
+    flexop_register(name, help, NULL, var, NULL, VT_FLOAT);
 }
 
 void flexop_register_string(const char *name, const char *help, char **var)
 {
-    flexop_register(name, help, NULL, var, VT_STRING);
+    flexop_register(name, help, NULL, var, NULL, VT_STRING);
 }
 
 void flexop_register_keyword(const char *name, const char *help, const char **keys, int *var)
 {
-    flexop_register(name, help, keys, var, VT_KEYWORD);
+    flexop_register(name, help, keys, var, NULL, VT_KEYWORD);
 }
 
 void flexop_register_title(const char *str, const char *help, const char *category)
 {
     /* Note: category will be stored in '->var' */
-    flexop_register(str, help, NULL, (void *)category, VT_TITLE);
+    flexop_register(str, help, NULL, (void *)category, NULL, VT_TITLE);
 }
 
-void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER func)
+void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER func, void *hvar)
 {
-    flexop_register(name, help, NULL, func, VT_HANDLER);
+    flexop_register(name, help, NULL, func, hvar, VT_HANDLER);
 }
 
 void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var)
 {
-    flexop_register(name, help, NULL, var, VT_VEC_INT);
+    flexop_register(name, help, NULL, var, NULL, VT_VEC_INT);
 }
 
 void flexop_register_vec_uint(const char *name, const char *help, FLEXOP_VEC *var)
 {
-    flexop_register(name, help, NULL, var, VT_VEC_UINT);
+    flexop_register(name, help, NULL, var, NULL, VT_VEC_UINT);
 }
 
 void flexop_register_vec_float(const char *name, const char *help, FLEXOP_VEC *var)
 {
-    flexop_register(name, help, NULL, var, VT_VEC_FLOAT);
+    flexop_register(name, help, NULL, var, NULL, VT_VEC_FLOAT);
 }
 
 void flexop_register_vec_string(const char *name, const char *help, FLEXOP_VEC *var)
 {
-    flexop_register(name, help, NULL, var, VT_VEC_STRING);
+    flexop_register(name, help, NULL, var, NULL, VT_VEC_STRING);
 }
 
 static int flexop_comp(const void *i0, const void *i1)
@@ -241,8 +243,8 @@ void flexop_sort(FLEXOP *opt)
     if (opt->sorted) return;
 
     /* append a dummy entry at the end of the list as the key for bsearch */
-    flexop_register("dummy", NULL, NULL, NULL, VT_BOOL);
-    opt->index = flexop_alloc(opt->size * sizeof(*opt->index));
+    flexop_register("dummy", NULL, NULL, NULL, NULL, VT_BOOL);
+    opt->index = flexop_malloc(opt->size * sizeof(*opt->index));
 
     for (i = 0; i < (int)opt->size; i++) opt->index[i] = i;
 
@@ -772,7 +774,7 @@ void flexop_parse_options(int *argc, char ***argv, int *alloc, const char *optst
     const char *optstr0 = optstr, *r;
     int ac = *argc;
 
-    p = flexop_alloc(strlen(optstr) + 1);
+    p = flexop_malloc(strlen(optstr) + 1);
 
     while (1) {
         while (isspace(*(const char *)optstr)) optstr++;
@@ -1166,7 +1168,7 @@ void flexop_parse(int *argc, char ***argv)
     /* register internal opt */
     if (flexop_iopt.options == NULL) {
         /* this will register the options '-help' */
-        flexop_register(NULL, NULL, NULL, NULL, VT_BOOL);
+        flexop_register(NULL, NULL, NULL, NULL, NULL, VT_BOOL);
     }
 
     flexop_sort(&flexop_iopt);
@@ -1188,7 +1190,7 @@ void flexop_parse(int *argc, char ***argv)
     /* handle command line */
     assert(*argc > 0);
     flexop_iopt.argc = *argc - 1;
-    flexop_iopt.argv = flexop_alloc((flexop_iopt.argc + 1) * sizeof(*flexop_iopt.argv));
+    flexop_iopt.argv = flexop_malloc((flexop_iopt.argc + 1) * sizeof(*flexop_iopt.argv));
 
     for (i = 0; i < flexop_iopt.argc; i++) flexop_iopt.argv[i] = strdup((*argv)[i + 1]);
     flexop_iopt.argv[i] = NULL;
@@ -1205,7 +1207,7 @@ void flexop_parse(int *argc, char ***argv)
 void flexop_init(int *argc, char ***argv)
 {
     /* option init */
-    flexop_register(NULL, NULL, NULL, NULL, VT_INIT);
+    flexop_register(NULL, NULL, NULL, NULL, NULL, VT_INIT);
 
     /* option parse */
     flexop_parse(argc, argv);

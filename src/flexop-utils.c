@@ -42,7 +42,7 @@ int flexop_printf(const char *fmt, ...)
     return ret;
 }
 
-void * flexop_alloc(size_t size)
+void * flexop_malloc(size_t size)
 {
     void *ptr = (size != 0) ? malloc(size) : NULL;
 

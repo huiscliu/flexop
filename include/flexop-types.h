@@ -84,6 +84,7 @@ typedef struct FLEXOP_KEY
     char  *name;        /* option name without leading dash */
     char  *help;        /* help text for this option */
     char  **keys;       /* list of key words if type is VT_KEYWORD */
+    void  *hvar;        /* variable address for VT_HANDLER */
     void  *var;         /* address of the variable to assign value to
                            It's assumed to have the following type:
                                - VT_HANDLER  (FLEXOP_HANDLER)var

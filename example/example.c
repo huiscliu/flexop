@@ -1,10 +1,10 @@
 
 #include "flexop.h"
 
-static FLEXOP_FLOAT stof = 2.1;
-
 static int string_to_float(FLEXOP_KEY *o, const char *arg)
 {
+    FLEXOP_FLOAT *t = o->hvar;
+
     assert(o != NULL);
 
     if (arg == NULL) {
@@ -12,7 +12,7 @@ static int string_to_float(FLEXOP_KEY *o, const char *arg)
         return 0;
     }
 
-    stof = flexop_atof(arg);
+    *t = flexop_atof(arg);
 
     return 1;
 }
@@ -28,6 +28,7 @@ int main(int argc, char **argv)
     FLEXOP_VEC vu;
     FLEXOP_VEC vf;
     FLEXOP_VEC vs;
+    FLEXOP_FLOAT stof = 2.1;
 
     int bol = 0;
 
@@ -46,15 +47,15 @@ int main(int argc, char **argv)
     int order = 0;
 
     /* preset values */
-    flexop_preset(p_i);
-    flexop_preset(p_ui);
-    flexop_preset(p_f);
-    flexop_preset(p_s);
+    flexop_preset_cmd_options(p_i);
+    flexop_preset_cmd_options(p_ui);
+    flexop_preset_cmd_options(p_f);
+    flexop_preset_cmd_options(p_s);
 
-    flexop_preset(p_vi);
-    flexop_preset(p_vu);
-    flexop_preset(p_vf);
-    flexop_preset(p_vs);
+    flexop_preset_cmd_options(p_vi);
+    flexop_preset_cmd_options(p_vu);
+    flexop_preset_cmd_options(p_vf);
+    flexop_preset_cmd_options(p_vs);
 
     /* print */
     flexop_printf("Preset command line:\n");
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
 
     /* handler */
     flexop_register_title("Handler demo", "", "handler");
-    flexop_register_handler("stof", "string to floating point number", string_to_float);
+    flexop_register_handler("stof", "string to floating point number", string_to_float, &stof);
 
     /* init, parse */
     flexop_init(&argc, &argv);
