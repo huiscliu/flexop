@@ -19,6 +19,7 @@ void   flexop_free(void *ptr);
 
 FLEXOP_FLOAT flexop_atof(const char *ptr);
 FLEXOP_INT flexop_atoi(const char *ptr);
+FLEXOP_UINT flexop_atou(const char *ptr);
 
 void flexop_set_print_mark(int m);
 

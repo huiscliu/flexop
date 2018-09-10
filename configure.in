@@ -92,17 +92,20 @@ if test "$enable_big_int" = "yes"; then
         AC_DEFINE(FLEXOP_USE_LONG, 0)
         AC_MSG_NOTICE([* use 'long long' for INT])
         AC_DEFINE(IFMT, ["lld"])
+        AC_DEFINE(UFMT, ["llu"])
     else
         AC_DEFINE(FLEXOP_USE_LONG_LONG, 0)
         AC_DEFINE(FLEXOP_USE_LONG, 1)
         AC_MSG_NOTICE([* use 'long' for INT])
         AC_DEFINE(IFMT, ["ld"])
+        AC_DEFINE(UFMT, ["lu"])
     fi
 else
     AC_MSG_NOTICE(* use 'int' for 'INT')
     AC_DEFINE(FLEXOP_USE_LONG_LONG, 0)
     AC_DEFINE(FLEXOP_USE_LONG, 0)
     AC_DEFINE(IFMT, ["d"])
+    AC_DEFINE(UFMT, ["u"])
 fi
 
 #--------------------------------------- Floating point

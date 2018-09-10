@@ -20,20 +20,24 @@ static int string_to_float(FLEXOP_KEY *o, const char *arg)
 int main(int argc, char **argv)
 {
     FLEXOP_INT i;
+    FLEXOP_UINT ui;
     FLEXOP_FLOAT f; 
     char *s;
 
     FLEXOP_VEC vi;
+    FLEXOP_VEC vu;
     FLEXOP_VEC vf;
     FLEXOP_VEC vs;
 
     int bol = 0;
 
     char *p_i = "-i 22";
+    char *p_ui = "-ui 2";
     char *p_f = "-f 1.2";
     char *p_s = "-s hello";
 
     char *p_vi = "-vi \" 1 2 1 3 1 4\"";
+    char *p_vu = "-vu \"2222 1 2 1 3 1 4\"";
     char *p_vf = "-vf \" 0.1 2e-3 1.2 3.33333 2.1 3.4\"";
     char *p_vs = "-vs \" hello this world\"";
     char *p_or = "-order one";
@@ -43,10 +47,12 @@ int main(int argc, char **argv)
 
     /* preset values */
     flexop_preset(p_i);
+    flexop_preset(p_ui);
     flexop_preset(p_f);
     flexop_preset(p_s);
 
     flexop_preset(p_vi);
+    flexop_preset(p_vu);
     flexop_preset(p_vf);
     flexop_preset(p_vs);
 
@@ -54,9 +60,11 @@ int main(int argc, char **argv)
     flexop_printf("Preset command line:\n");
     flexop_printf("----------------------------------\n");
     flexop_printf("%s\n", p_i);
+    flexop_printf("%s\n", p_ui);
     flexop_printf("%s\n", p_f);
     flexop_printf("%s\n", p_s);
     flexop_printf("%s\n", p_vi);
+    flexop_printf("%s\n", p_vu);
     flexop_printf("%s\n", p_vf);
     flexop_printf("%s\n", p_vs);
     flexop_printf("%s\n", p_or);
@@ -64,12 +72,14 @@ int main(int argc, char **argv)
 
     /* register scalar key words */
     flexop_register_int("i", "int", &i);
+    flexop_register_uint("ui", "unsigned int", &ui);
     flexop_register_float("f", "float", &f);
     flexop_register_string("s", "string", &s);
 
     /* register vector key words */
     flexop_register_title("Vector section", "", "vector");
     flexop_register_vec_int("vi", "vector of int", &vi);
+    flexop_register_vec_uint("vu", "vector of int", &vu);
     flexop_register_vec_float("vf", "vector of float", &vf);
     flexop_register_vec_string("vs", "vector of string", &vs);
 
@@ -91,10 +101,12 @@ int main(int argc, char **argv)
     flexop_printf("Parsed parameters:\n");
     flexop_printf("----------------------------------\n");
     flexop_printf("flexop: key: \"i\": %"IFMT"\n", i);
+    flexop_printf("flexop: key: \"ui\": %"UFMT"\n", ui);
     flexop_printf("flexop: key: \"f\": %"FFMT"\n", f);
     flexop_printf("flexop: key: \"s\": %s\n", s);
 
     flexop_vec_print(&vi);
+    flexop_vec_print(&vu);
     flexop_vec_print(&vf);
     flexop_vec_print(&vs);
 
@@ -127,9 +139,11 @@ int main(int argc, char **argv)
 
     /* set option, change parsed options */
     flexop_set_int("i", 8);
+    flexop_set_uint("ui", 18);
     flexop_set_float("f", 1.11111);
     flexop_set_string("s", "usa");
     flexop_set_vec_int("vi", "8 8 8 8 4 4 4 4");
+    flexop_set_vec_uint("vu", "1111 111 222 3 4 8 8 8 8 4 4 4 4");
     flexop_set_vec_float("vf", "11.11 2.2 3.1 4.4 4e-8");
     flexop_set_vec_string("vs", "a b c d z f g g g gg hi jill hill");
     flexop_set_keyword("order", "three");
@@ -143,6 +157,7 @@ int main(int argc, char **argv)
     flexop_printf("flexop: key: \"s\": %s\n", s);
 
     flexop_vec_print(&vi);
+    flexop_vec_print(&vu);
     flexop_vec_print(&vf);
     flexop_vec_print(&vs);
 

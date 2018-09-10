@@ -18,6 +18,7 @@ void flexop_vec_add_entry(FLEXOP_VEC *v, void *e);
 
 /* get value */
 FLEXOP_INT flexop_vec_int_get_value(FLEXOP_VEC *v, FLEXOP_INT n);
+FLEXOP_UINT flexop_vec_uint_get_value(FLEXOP_VEC *v, FLEXOP_INT n);
 FLEXOP_FLOAT flexop_vec_float_get_value(FLEXOP_VEC *v, FLEXOP_INT n);
 char * flexop_vec_string_get_value(FLEXOP_VEC *v, FLEXOP_INT n);
 

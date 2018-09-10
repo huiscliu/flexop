@@ -3682,6 +3682,8 @@ if test "$enable_big_int" = "yes"; then
 $as_echo "$as_me: * use 'long long' for INT" >&6;}
         $as_echo "#define IFMT \"lld\"" >>confdefs.h
 
+        $as_echo "#define UFMT \"llu\"" >>confdefs.h
+
     else
         $as_echo "#define FLEXOP_USE_LONG_LONG 0" >>confdefs.h
 
@@ -3690,6 +3692,8 @@ $as_echo "$as_me: * use 'long long' for INT" >&6;}
         { $as_echo "$as_me:${as_lineno-$LINENO}: * use 'long' for INT" >&5
 $as_echo "$as_me: * use 'long' for INT" >&6;}
         $as_echo "#define IFMT \"ld\"" >>confdefs.h
+
+        $as_echo "#define UFMT \"lu\"" >>confdefs.h
 
     fi
 else
@@ -3700,6 +3704,8 @@ $as_echo "$as_me: * use 'int' for 'INT'" >&6;}
     $as_echo "#define FLEXOP_USE_LONG 0" >>confdefs.h
 
     $as_echo "#define IFMT \"d\"" >>confdefs.h
+
+    $as_echo "#define UFMT \"u\"" >>confdefs.h
 
 fi
 

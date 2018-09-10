@@ -20,11 +20,14 @@ typedef double            FLEXOP_FLOAT;
 #endif
 
 #if FLEXOP_USE_LONG_LONG
-typedef long long int     FLEXOP_INT;
+typedef long long int            FLEXOP_INT;
+typedef unsigned long long int   FLEXOP_UINT;
 #elif FLEXOP_USE_LONG
-typedef long int          FLEXOP_INT;
+typedef long int                 FLEXOP_INT;
+typedef unsigned long int        FLEXOP_UINT;
 #else
-typedef int               FLEXOP_INT;
+typedef int                      FLEXOP_INT;
+typedef unsigned int             FLEXOP_UINT;
 #endif
 
 #define FLEXOP_VEC_MAGIC_NUMBER        (0x2619EFE)
@@ -58,18 +61,19 @@ typedef int               FLEXOP_INT;
 
 typedef enum {
     VT_INIT,
-    VT_BOOL,
-
     VT_TITLE,
 
-    VT_INT,
-    VT_FLOAT,
-    VT_STRING,
-
+    VT_BOOL,
     VT_KEYWORD,
     VT_HANDLER,
 
+    VT_INT,
+    VT_UINT,
+    VT_FLOAT,
+    VT_STRING,
+
     VT_VEC_INT,
+    VT_VEC_UINT,
     VT_VEC_FLOAT,
     VT_VEC_STRING,
 

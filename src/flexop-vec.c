@@ -28,6 +28,9 @@ void flexop_vec_init(FLEXOP_VEC *vec, FLEXOP_VTYPE type, FLEXOP_INT tsize, const
     if (type == VT_INT) {
         vec->tsize = sizeof(FLEXOP_INT);
     }
+    else if (type == VT_UINT) {
+        vec->tsize = sizeof(FLEXOP_UINT);
+    }
     else if (type == VT_FLOAT) {
         vec->tsize = sizeof(FLEXOP_FLOAT);
     }
@@ -75,6 +78,9 @@ void flexop_vec_add_entry(FLEXOP_VEC *v, void *e)
     if (v->type == VT_INT) {
         ((FLEXOP_INT *)v->d)[v->size++] = *(FLEXOP_INT *)e;
     }
+    else if (v->type == VT_UINT) {
+        ((FLEXOP_UINT *)v->d)[v->size++] = *(FLEXOP_UINT *)e;
+    }
     else if (v->type == VT_FLOAT) {
         ((FLEXOP_FLOAT *)v->d)[v->size++] = *(FLEXOP_FLOAT *)e;
     }
@@ -102,6 +108,16 @@ FLEXOP_INT flexop_vec_int_get_value(FLEXOP_VEC *v, FLEXOP_INT n)
 
     assert(v->type == VT_INT);
     return ((FLEXOP_INT *)v->d)[n];
+}
+
+FLEXOP_UINT flexop_vec_uint_get_value(FLEXOP_VEC *v, FLEXOP_INT n)
+{
+    assert(v != NULL);
+    assert(n >= 0);
+    assert(n < v->size);
+
+    assert(v->type == VT_UINT);
+    return ((FLEXOP_UINT *)v->d)[n];
 }
 
 FLEXOP_FLOAT flexop_vec_float_get_value(FLEXOP_VEC *v, FLEXOP_INT n)
@@ -136,6 +152,18 @@ void flexop_vec_print(FLEXOP_VEC *v)
 
         for (i = 0; i < v->size; i++) {
             flexop_printf(" %"IFMT, p[i]);
+        }
+
+        flexop_printf("\n");
+    }
+    else if (v->type == VT_UINT) {
+        FLEXOP_UINT *p;
+
+        p = v->d;
+        flexop_printf("flexop: key: \"%s\", vector of int, size: %d, values:", v->key, v->size);
+
+        for (i = 0; i < v->size; i++) {
+            flexop_printf(" %"UFMT, p[i]);
         }
 
         flexop_printf("\n");

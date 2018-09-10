@@ -125,6 +125,32 @@ FLEXOP_INT flexop_atoi(const char *ptr)
     return t;
 }
 
+FLEXOP_UINT flexop_atou(const char *ptr)
+{
+#if FLEXOP_USE_LONG_LONG
+    unsigned long long t;
+#elif FLEXOP_USE_LONG
+    unsigned long t;
+#else
+    unsigned int t;
+#endif
+    char *end;
+
+#if FLEXOP_USE_LONG_LONG
+    t = strtoull(ptr, &end, 10);
+#elif FLEXOP_USE_LONG
+    t = strtoul(ptr, &end, 10);
+#else
+    t = strtoul(ptr, &end, 10);
+#endif
+
+    if (end == ptr || (*end != '\0' && isspace(*end) == 0)) {
+        flexop_error(1, "flexop: ptr: \"%s\" is not an unsigned integer.\n", ptr);
+    }
+
+    return t;
+}
+
 void flexop_set_print_mark(int m)
 {
     if (m) {

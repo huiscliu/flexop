@@ -3,6 +3,14 @@
 
 static FLEXOP flexop_iopt;
 
+void flexop_sort(FLEXOP *opt);
+void flexop_parse_options(int *argc, char ***argv, int *alloc, const char *optstr);
+void flexop_parse_options_file(const char *fn);
+void flexop_reset(FLEXOP *opt);
+void flexop_print_help(FLEXOP_KEY *o, const char *help);
+void flexop_parse(int *argc, char ***argv);
+void flexop_parse_cmdline(int argc, char ***argv);
+
 static void flexop_key_destroy(FLEXOP_KEY *o)
 {
     char **p;
@@ -15,7 +23,10 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
         flexop_free(*(char **)o->var);
         *(char **)o->var = NULL;
     }
-    else if (o->type == VT_VEC_INT || o->type == VT_VEC_FLOAT || o->type == VT_VEC_STRING) {
+    else if (o->type == VT_VEC_INT || o->type == VT_VEC_UINT) {
+        flexop_vec_destroy(o->var);
+    }
+    else if (o->type == VT_VEC_FLOAT || o->type == VT_VEC_STRING) {
         flexop_vec_destroy(o->var);
     }
 
@@ -132,6 +143,9 @@ static void flexop_register(const char *name, const char *help, const char **key
     else if (type == VT_VEC_INT) {
         flexop_vec_init((FLEXOP_VEC *)o->var, VT_INT, -1, name);
     }
+    else if (type == VT_VEC_UINT) {
+        flexop_vec_init((FLEXOP_VEC *)o->var, VT_UINT, -1, name);
+    }
     else if (type == VT_VEC_FLOAT) {
         flexop_vec_init((FLEXOP_VEC *)o->var, VT_FLOAT, -1, name);
     }
@@ -149,6 +163,11 @@ void flexop_register_bool(const char *name, const char *help, int *var)
 void flexop_register_int(const char *name, const char *help, FLEXOP_INT *var)
 {
     flexop_register(name, help, NULL, var, VT_INT);
+}
+
+void flexop_register_uint(const char *name, const char *help, FLEXOP_UINT *var)
+{
+    flexop_register(name, help, NULL, var, VT_UINT);
 }
 
 void flexop_register_float(const char *name, const char *help, FLEXOP_FLOAT *var)
@@ -180,6 +199,11 @@ void flexop_register_handler(const char *name, const char *help, FLEXOP_HANDLER 
 void flexop_register_vec_int(const char *name, const char *help, FLEXOP_VEC *var)
 {
     flexop_register(name, help, NULL, var, VT_VEC_INT);
+}
+
+void flexop_register_vec_uint(const char *name, const char *help, FLEXOP_VEC *var)
+{
+    flexop_register(name, help, NULL, var, VT_VEC_UINT);
 }
 
 void flexop_register_vec_float(const char *name, const char *help, FLEXOP_VEC *var)
@@ -432,6 +456,11 @@ void flexop_show_used(void)
                         *(FLEXOP_INT *)o->var);
                 break;
 
+            case VT_UINT:
+                flexop_printf("* %s: %"UFMT"\n", o->help == NULL ? o->name : o->help,
+                        *(FLEXOP_UINT *)o->var);
+                break;
+
             case VT_FLOAT:
                 flexop_printf("* %s: %"FFMT"\n", o->help == NULL ? o->name : o->help,
                         (FLEXOP_FLOAT)*(FLEXOP_FLOAT *)o->var);
@@ -476,6 +505,22 @@ void flexop_show_used(void)
                     v = o->var;
                     for (i = 0; i < v->size; i++) {
                         flexop_printf(" %"IFMT, flexop_vec_int_get_value(v, i));
+                    }
+
+                    flexop_printf("\n");
+                }
+
+                break;
+
+            case VT_VEC_UINT:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("* %s:", o->help == NULL ? o->name : o->help);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf(" %"UFMT, flexop_vec_uint_get_value(v, i));
                     }
 
                     flexop_printf("\n");
@@ -575,6 +620,10 @@ void flexop_help(void)
                 flexop_printf("  -%s <integer> (%"IFMT")", o->name, *(FLEXOP_INT *)o->var);
                 break;
 
+            case VT_UINT:
+                flexop_printf("  -%s <unsigned integer> (%"UFMT")", o->name, *(FLEXOP_UINT *)o->var);
+                break;
+
             case VT_FLOAT:
                 flexop_printf("  -%s <real> (%"FFMT")", o->name, (FLEXOP_FLOAT)*(FLEXOP_FLOAT *)o->var);
                 break;
@@ -611,6 +660,24 @@ void flexop_help(void)
                     v = o->var;
                     for (i = 0; i < v->size; i++) {
                         flexop_printf("%"IFMT, flexop_vec_int_get_value(v, i));
+
+                        if (i < v->size - 1) flexop_printf(" ");
+                    }
+
+                    flexop_printf(")");
+                }
+
+                break;
+
+            case VT_VEC_UINT:
+                {
+                    FLEXOP_VEC *v;
+
+                    flexop_printf("  -%s <unsigned integer> (", o->name);
+
+                    v = o->var;
+                    for (i = 0; i < v->size; i++) {
+                        flexop_printf("%"UFMT, flexop_vec_uint_get_value(v, i));
 
                         if (i < v->size - 1) flexop_printf(" ");
                     }
@@ -878,6 +945,11 @@ void flexop_parse_cmdline(int argc, char ***argv)
                 o->used = 1;
                 break;
 
+            case VT_UINT:
+                *(FLEXOP_UINT *)o->var = flexop_atou(arg);
+                o->used = 1;
+                break;
+
             case VT_FLOAT:
                 *(FLEXOP_FLOAT *)o->var = flexop_atof(arg);
                 o->used = 1;
@@ -969,6 +1041,38 @@ void flexop_parse_cmdline(int argc, char ***argv)
 
                     while (ip != NULL) {
                         tp = flexop_atoi(ip);
+
+                        flexop_vec_add_entry(v, &tp);
+                        ip = strtok(NULL, " \t");
+                    }
+
+                    o->used = 1;
+                    free(ta);
+                }
+
+                break;
+
+            case VT_VEC_UINT:
+                {
+                    FLEXOP_VEC *v;
+                    FLEXOP_UINT tp;
+                    char *ta = NULL;
+                    char *ip;
+
+                    /* init vec */
+                    v = o->var;
+                    if (o->used && flexop_vec_initialized(v)) {
+                        flexop_vec_destroy(v);
+                        flexop_vec_init(v, VT_UINT, -1, o->name);
+                    }
+                    
+                    /* parse */
+                    ta = strdup(arg);
+
+                    ip = strtok(ta, " \t");
+
+                    while (ip != NULL) {
+                        tp = flexop_atou(ip);
 
                         flexop_vec_add_entry(v, &tp);
                         ip = strtok(NULL, " \t");
@@ -1173,6 +1277,10 @@ static int get_option(const char *op_name, void **pvar, int type, const char *fu
                 flexop_error(1, "Please use flexop_get_int instead.\n");
                 break;
 
+            case VT_UINT:
+                flexop_error(1, "Please use flexop_get_uint instead.\n");
+                break;
+
             case VT_FLOAT:
                 flexop_error(1, "Please use flexop_get_double instead.\n");
                 break;
@@ -1193,6 +1301,10 @@ static int get_option(const char *op_name, void **pvar, int type, const char *fu
                 flexop_error(1, "Please use flexop_get_vec_int instead.\n");
                 break;
 
+            case VT_VEC_UINT:
+                flexop_error(1, "Please use flexop_get_vec_uint instead.\n");
+                break;
+
             case VT_VEC_FLOAT:
                 flexop_error(1, "Please use flexop_get_vec_float instead.\n");
                 break;
@@ -1211,6 +1323,7 @@ static int get_option(const char *op_name, void **pvar, int type, const char *fu
     switch (o->type) {
         case VT_BOOL:
         case VT_INT:
+        case VT_UINT:
         case VT_FLOAT:
             *pvar = o->var;
             break;
@@ -1255,6 +1368,15 @@ FLEXOP_INT flexop_get_int(const char *op_name)
     return *(FLEXOP_INT *)value;
 }
 
+FLEXOP_UINT flexop_get_uint(const char *op_name)
+{
+    void *value;
+
+    get_option(op_name, &value, VT_UINT, __func__);
+
+    return *(FLEXOP_INT *)value;
+}
+
 FLEXOP_FLOAT flexop_get_float(const char *op_name)
 {
     void *value;
@@ -1287,6 +1409,15 @@ FLEXOP_VEC * flexop_get_vec_int(const char *op_name)
     void *value;
 
     get_option(op_name, &value, VT_VEC_INT, __func__);
+
+    return value;
+}
+
+FLEXOP_VEC * flexop_get_vec_uint(const char *op_name)
+{
+    void *value;
+
+    get_option(op_name, &value, VT_VEC_UINT, __func__);
 
     return value;
 }
@@ -1345,6 +1476,10 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
                 flexop_error(1, "Please use flexop_set_int instead.\n");
                 break;
 
+            case VT_UINT:
+                flexop_error(1, "Please use flexop_set_uint instead.\n");
+                break;
+
             case VT_FLOAT:
                 flexop_error(1, "Please use flexop_set_double instead.\n");
                 break;
@@ -1362,9 +1497,19 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
                 break;
 
             case VT_VEC_INT:
+                flexop_error(1, "Please use flexop_set_vec_int instead.\n");
+                break;
+
+            case VT_VEC_UINT:
+                flexop_error(1, "Please use flexop_set_vec_uint instead.\n");
+                break;
+
             case VT_VEC_FLOAT:
+                flexop_error(1, "Please use flexop_set_vec_float instead.\n");
+                break;
+
             case VT_VEC_STRING:
-                flexop_error(1, "Please use flexop_set_handler instead.\n");
+                flexop_error(1, "Please use flexop_set_vec_string instead.\n");
                 break;
 
             default:
@@ -1381,6 +1526,11 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
 
         case VT_INT:
             *(FLEXOP_INT *)o->var = *(FLEXOP_INT *)value;
+            o->used = 1;
+            break;
+
+        case VT_UINT:
+            *(FLEXOP_UINT *)o->var = *(FLEXOP_UINT *)value;
             o->used = 1;
             break;
 
@@ -1445,7 +1595,7 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
             o->used = 1;
             break;
 
-            case VT_VEC_INT:
+        case VT_VEC_INT:
             {
                 FLEXOP_VEC *v;
                 FLEXOP_INT tp;
@@ -1476,64 +1626,95 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
 
             break;
 
-            case VT_VEC_FLOAT:
-                {
-                    FLEXOP_VEC *v;
-                    FLEXOP_FLOAT tp;
-                    char *ta = NULL;
-                    char *ip;
+        case VT_VEC_UINT:
+            {
+                FLEXOP_VEC *v;
+                FLEXOP_UINT tp;
+                char *ta = NULL;
+                char *ip;
 
-                    /* init vec */
-                    v = o->var;
-                    if (o->used && flexop_vec_initialized(v)) {
-                        flexop_vec_destroy(v);
-                        flexop_vec_init(v, VT_FLOAT, -1, o->name);
-                    }
-                    
-                    /* parse */
-                    ta = strdup(value);
-                    ip = strtok(ta, " \t");
-
-                    while (ip != NULL) {
-                        tp = flexop_atof(ip);
-
-                        flexop_vec_add_entry(v, &tp);
-                        ip = strtok(NULL, " \t");
-                    }
-
-                    o->used = 1;
-                    free(ta);
+                /* init vec */
+                v = o->var;
+                if (o->used && flexop_vec_initialized(v)) {
+                    flexop_vec_destroy(v);
+                    flexop_vec_init(v, VT_UINT, -1, o->name);
                 }
 
-                break;
+                /* parse */
+                ta = strdup(value);
+                ip = strtok(ta, " \t");
 
-            case VT_VEC_STRING:
-                {
-                    FLEXOP_VEC *v;
-                    char *ta = NULL;
-                    char *ip;
+                while (ip != NULL) {
+                    tp = flexop_atou(ip);
 
-                    /* init vec */
-                    v = o->var;
-                    if (o->used && flexop_vec_initialized(v)) {
-                        flexop_vec_destroy(v);
-                        flexop_vec_init(v, VT_STRING, -1, o->name);
-                    }
-                    
-                    /* parse */
-                    ta = strdup(value);
-                    ip = strtok(ta, " \t");
-
-                    while (ip != NULL) {
-                        flexop_vec_add_entry(v, ip);
-                        ip = strtok(NULL, " \t");
-                    }
-
-                    o->used = 1;
-                    free(ta);
+                    flexop_vec_add_entry(v, &tp);
+                    ip = strtok(NULL, " \t");
                 }
 
-                break;
+                o->used = 1;
+                free(ta);
+            }
+
+            break;
+
+        case VT_VEC_FLOAT:
+            {
+                FLEXOP_VEC *v;
+                FLEXOP_FLOAT tp;
+                char *ta = NULL;
+                char *ip;
+
+                /* init vec */
+                v = o->var;
+                if (o->used && flexop_vec_initialized(v)) {
+                    flexop_vec_destroy(v);
+                    flexop_vec_init(v, VT_FLOAT, -1, o->name);
+                }
+
+                /* parse */
+                ta = strdup(value);
+                ip = strtok(ta, " \t");
+
+                while (ip != NULL) {
+                    tp = flexop_atof(ip);
+
+                    flexop_vec_add_entry(v, &tp);
+                    ip = strtok(NULL, " \t");
+                }
+
+                o->used = 1;
+                free(ta);
+            }
+
+            break;
+
+        case VT_VEC_STRING:
+            {
+                FLEXOP_VEC *v;
+                char *ta = NULL;
+                char *ip;
+
+                /* init vec */
+                v = o->var;
+                if (o->used && flexop_vec_initialized(v)) {
+                    flexop_vec_destroy(v);
+                    flexop_vec_init(v, VT_STRING, -1, o->name);
+                }
+
+                /* parse */
+                ta = strdup(value);
+                ip = strtok(ta, " \t");
+
+                while (ip != NULL) {
+                    flexop_vec_add_entry(v, ip);
+                    ip = strtok(NULL, " \t");
+                }
+
+                o->used = 1;
+                free(ta);
+            }
+
+            break;
 
         default:
             /* not allowed */
@@ -1571,6 +1752,11 @@ int flexop_set_int(const char *op_name, FLEXOP_INT value)
     return set_option(op_name, &value, VT_INT, __func__);
 }
 
+int flexop_set_uint(const char *op_name, FLEXOP_UINT value)
+{
+    return set_option(op_name, &value, VT_UINT, __func__);
+}
+
 int flexop_set_float(const char *op_name, FLEXOP_FLOAT value)
 {
     return set_option(op_name, &value, VT_FLOAT, __func__);
@@ -1594,6 +1780,11 @@ int flexop_set_handler(const char *op_name, const char *value)
 int flexop_set_vec_int(const char *op_name, const char *value)
 {
     return set_option(op_name, (void *)value, VT_VEC_INT, __func__);
+}
+
+int flexop_set_vec_uint(const char *op_name, const char *value)
+{
+    return set_option(op_name, (void *)value, VT_VEC_UINT, __func__);
 }
 
 int flexop_set_vec_float(const char *op_name, const char *value)
