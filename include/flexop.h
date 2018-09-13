@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 /* preset values */
-void flexop_preset_cmd_options(const char *str);
+void flexop_preset_cmdline(const char *str);
 
 /* init option */
 void flexop_init(int *argc, char ***argv);

@@ -8,7 +8,7 @@ static int string_to_float(FLEXOP_KEY *o, const char *arg)
     assert(o != NULL);
 
     if (arg == NULL) {
-        flexop_printf("usage: -o stof floating-point-number, such as \"-stof 2.3\"\n");
+        flexop_printf("usage: -stof floating-point-number, such as \"-stof 2.3\"\n");
         return 0;
     }
 
@@ -47,15 +47,15 @@ int main(int argc, char **argv)
     int order = 0;
 
     /* preset values */
-    flexop_preset_cmd_options(p_i);
-    flexop_preset_cmd_options(p_ui);
-    flexop_preset_cmd_options(p_f);
-    flexop_preset_cmd_options(p_s);
+    flexop_preset_cmdline(p_i);
+    flexop_preset_cmdline(p_ui);
+    flexop_preset_cmdline(p_f);
+    flexop_preset_cmdline(p_s);
 
-    flexop_preset_cmd_options(p_vi);
-    flexop_preset_cmd_options(p_vu);
-    flexop_preset_cmd_options(p_vf);
-    flexop_preset_cmd_options(p_vs);
+    flexop_preset_cmdline(p_vi);
+    flexop_preset_cmdline(p_vu);
+    flexop_preset_cmdline(p_vf);
+    flexop_preset_cmdline(p_vs);
 
     /* print */
     flexop_printf("Preset command line:\n");
@@ -188,6 +188,13 @@ int main(int argc, char **argv)
     flexop_printf("flexop: key: \"stof\": %"FFMT"\n", stof);
 
     flexop_printf("----------------------------------\n\n\n");
+
+    flexop_printf("------------------------ show cmdline ------------------------\n");
+    flexop_show_cmdline();
+    flexop_printf("\n");
+
+    flexop_show_used();
+
     flexop_finalize();
 
     return 0;

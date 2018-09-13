@@ -38,10 +38,10 @@ static void flexop_key_destroy(FLEXOP_KEY *o)
     }
 }
 
-void flexop_preset_cmd_options(const char *str)
+void flexop_preset_cmdline(const char *str)
 {
     if (flexop_iopt.initialized) {
-        flexop_error(1, "flexop_preset_cmd_options must be called before flexop_init!\n");
+        flexop_error(1, "flexop_preset_cmdline must be called before flexop_init!\n");
     }
 
     flexop_parse_options(&flexop_iopt.argcp, &flexop_iopt.argvp, &flexop_iopt.allocp, str);
@@ -1469,6 +1469,7 @@ static int set_option(const char *op_name, void *value, int type, const char *fu
 
     if (type >= 0 && (int)o->type != type) {
         flexop_printf("%s: wrong function type for \"-%s\".", func, op_name);
+
         switch (o->type) {
             case VT_BOOL:
                 flexop_error(1, "Please use flexop_set_bool instead.\n");
